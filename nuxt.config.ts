@@ -5,6 +5,8 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
 
+  components: [{ path: '~/components', pathPrefix: false }],
+
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
   },
@@ -31,7 +33,7 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap',
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;600&family=Poppins:wght@400;500;600&display=swap',
         },
       ],
     },

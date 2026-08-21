@@ -1,5 +1,7 @@
-import { mockTransportations, mockTransportRoutes } from '~/data/mock/transportations'
+import { mockTransportations, mockTransportRoutes, mockTransportRouteOptions } from '~/data/mock/transportations'
 import type { Transportation } from '~/types'
+
+import type { TransportRouteOption } from '~/types'
 
 /** Data-access layer — TRANSPORTATION. Phase berikutnya: GET /api/transportations */
 export function useTransportations() {
@@ -8,5 +10,9 @@ export function useTransportations() {
 
   const fetchPopularRoutes = async (): Promise<string[]> => mockTransportRoutes
 
-  return { fetchTransportations, fetchPopularRoutes }
+  /** Rute terpandu + opsi kendaraan & harga (dipakai estimator). */
+  const fetchTransportRouteOptions = async (): Promise<TransportRouteOption[]> =>
+    mockTransportRouteOptions
+
+  return { fetchTransportations, fetchPopularRoutes, fetchTransportRouteOptions }
 }
