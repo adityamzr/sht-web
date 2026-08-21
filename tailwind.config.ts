@@ -28,7 +28,7 @@ export default <Partial<Config>>{
         },
       },
       fontFamily: {
-        heading: ['"Playfair Display"', 'Poppins', 'Georgia', 'serif'],
+        heading: ['Montserrat', 'Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
