@@ -41,6 +41,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      // ⚠️ PRODUCTION CONFIG (M0): nilai di bawah masih PLACEHOLDER.
+      // Ganti dengan nilai resmi SHT sebelum deployment (override via env:
+      // NUXT_PUBLIC_WHATSAPP_NUMBER dan NUXT_PUBLIC_SITE_URL, lihat .env.example).
       whatsappNumber: '6281234567890', // PLACEHOLDER — ganti dengan nomor resmi SHT
       siteUrl: 'https://sudutharamain.id',
     },
@@ -48,6 +51,6 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: false,
+    typeCheck: true, // diaktifkan M0 — baseline typecheck bersih
   },
 })

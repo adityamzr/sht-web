@@ -1,7 +1,7 @@
 /**
  * Domain types — Sudut Haramain Tour (customer-facing).
  * Struktur mengikuti arahan Master Project Context: cukup untuk frontend sekarang,
- * siap digantikan oleh response Laravel REST API tanpa mengubah UI.
+ * siap digantikan oleh response SHT REST API (dari `sht-admin`, Nuxt/Nitro) tanpa mengubah UI.
  *
  * SECURITY RULE (locked): supplierCost & markup TIDAK BOLEH ada di sini.
  * Harga yang tampil ke customer selalu selling price.
@@ -178,15 +178,4 @@ export interface EstimatorBreakdown {
   categories: EstimateCategory[]
   total: number
   perPerson: number
-}
-
-/**
- * @deprecated Draft Phase 1 — digantikan EstimatorConfiguration.
- */
-export interface EstimatorDraft {
-  pilgrims: number
-  departureCity: 'Jakarta' | 'Bandung'
-  durationDays: number
-  makkahNights: number
-  madinahNights: number
 }

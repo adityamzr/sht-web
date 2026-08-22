@@ -1,7 +1,6 @@
 /**
  * Smoke test Phase 2 — mock calculator & business rules.
- * Jalankan dari /home/user/sht-web:  npx --yes tsx /home/user/test-estimator.ts
- * (File kerja di luar repo — tidak ikut ter-commit.)
+ * Jalankan: npm test   (script "test" di package.json → tsx)
  */
 import { calculateEstimate, roomCapacity } from '../utils/estimatorCalculator'
 import { mockHotels } from '../data/mock/hotels'

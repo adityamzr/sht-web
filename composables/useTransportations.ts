@@ -1,7 +1,5 @@
 import { mockTransportations, mockTransportRoutes, mockTransportRouteOptions } from '~/data/mock/transportations'
-import type { Transportation } from '~/types'
-
-import type { TransportRouteOption } from '~/types'
+import type { TransportRouteOption, Transportation } from '~/types'
 
 /** Data-access layer — TRANSPORTATION. Phase berikutnya: GET /api/transportations */
 export function useTransportations() {

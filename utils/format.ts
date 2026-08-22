@@ -9,11 +9,6 @@ export function formatCurrency(value: number, currency: Currency = 'IDR'): strin
   }).format(value)
 }
 
-/** "Rp 4.500.000" style pendek untuk card. */
-export function formatStartPrice(value: number, currency: Currency = 'IDR'): string {
-  return formatCurrency(value, currency)
-}
-
 /** Format tanggal ISO (yyyy-mm-dd) → "12 Oktober 2026". */
 export function formatDateID(iso: string): string {
   if (!iso) return ''

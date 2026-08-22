@@ -8,6 +8,7 @@
     "dev": "nuxt dev --host 0.0.0.0",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "test": "tsx tests/estimator-calculator.test.ts",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -19,6 +20,9 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.2",
-    "typescript": "^5.6.3"
+    "@types/node": "^22.20.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.6.3",
+    "vue-tsc": "^2.2.12"
   }
 }
