@@ -85,6 +85,9 @@ const serviceCards = [
     <!-- 1. HERO -->
     <HeroSection />
 
+    <!-- 2. PERSIAPAN UMROH MANDIRI (M4A.2 — education timeline) -->
+    <PreparationTimeline />
+
     <!-- 2. VALUE PROPOSITION -->
     <section class="py-14 sm:py-20">
       <Container>
