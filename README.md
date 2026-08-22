@@ -69,6 +69,7 @@ tests/          estimator-calculator, wa-message, submit-payload
 
 ## Aturan
 
+- **Warna brand resmi (M4A.1.1):** pakai token `sht.*` di `tailwind.config.ts` untuk semua pekerjaan UI baru — lihat [docs/BRAND-COLORS.md](./docs/BRAND-COLORS.md). Token lama (`brand.*`, `gold`, `neutral.*`) deprecated untuk UI baru.
 - Development flow: baca [DEVFLOW.md](./DEVFLOW.md) (locked).
 - Jangan menaruh supplier cost/markup di repo ini — customer hanya melihat selling price.
 - Harga/total dari client TIDAK dipercaya — backend menghitung ulang saat submit.
