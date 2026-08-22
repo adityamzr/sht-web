@@ -47,7 +47,7 @@ const store = useEstimatorStore()
         </span>
         <span class="mt-2 block text-sm text-neutral-charcoal/70">{{ flight.route }} · {{ flight.baggage }}</span>
         <span class="mt-3 block font-heading text-xl font-semibold text-brand-green">
-          {{ formatCurrency(flight.sellingPrice) }}
+          {{ formatPrice(flight.sellingPrice) }}
           <span class="font-sans text-xs font-normal text-neutral-charcoal/60">/orang · {{ pilgrims }} jamaah</span>
         </span>
       </button>

@@ -19,6 +19,7 @@ function selectionOf(serviceId: string) {
 }
 
 function hintOf(service: Service): string {
+  if (service.price === null) return 'Harga dikonfirmasi'
   return service.pricingUnit === 'pax'
     ? `${formatCurrency(service.price)} × ${store.pilgrims} jamaah`
     : `${formatCurrency(service.price)} ${unitText[service.pricingUnit]}`

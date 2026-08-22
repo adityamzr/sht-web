@@ -42,8 +42,8 @@ const isEnough = computed(() => capacity.value >= props.pilgrims && activeSelect
           <p class="font-heading text-base font-semibold text-neutral-charcoal">{{ rt.name }}</p>
           <p class="text-xs text-neutral-charcoal/60">{{ rt.capacity }} orang per kamar</p>
           <p class="mt-1 text-sm font-semibold text-brand-green">
-            {{ formatCurrency(rt.pricePerNight) }}
-            <span class="font-normal text-neutral-charcoal/60">/kamar/malam</span>
+            {{ formatPrice(rt.pricePerNight) }}
+            <span v-if="rt.pricePerNight !== null" class="font-normal text-neutral-charcoal/60">/kamar/malam</span>
           </p>
         </div>
         <CounterControl

@@ -78,7 +78,7 @@ function entry(routeId: string) {
             <span v-if="option.vehicle.capacity < pilgrims" class="mt-1.5 block text-xs font-medium text-gold">
               Kurang untuk {{ pilgrims }} jamaah
             </span>
-            <span class="mt-1.5 block text-sm font-semibold text-brand-green">{{ formatCurrency(option.price) }}</span>
+            <span class="mt-1.5 block text-sm font-semibold text-brand-green">{{ formatPrice(option.price) }}</span>
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@
     "dev": "nuxt dev --host localhost --port 3002",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "test": "tsx tests/estimator-calculator.test.ts && tsx --test tests/wa-message.test.ts tests/submit-payload.test.ts",
+    "test": "tsx tests/estimator-calculator.test.ts && tsx --test tests/wa-message.test.ts tests/submit-payload.test.ts tests/price-safety.test.ts tests/return-date.test.ts",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {

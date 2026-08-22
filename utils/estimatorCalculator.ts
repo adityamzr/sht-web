@@ -51,7 +51,7 @@ export function calculateEstimate(
 
   // ─── Kota keberangkatan ──────────────────────────────────────────────────
   const departure = data.departureCities.find((c) => c.id === config.departureCity)
-  if (departure && departure.feePerPax > 0) {
+  if (departure && departure.feePerPax !== null && departure.feePerPax > 0) {
     const amount = departure.feePerPax * pax
     categories.push({
       id: 'departure',
@@ -70,7 +70,8 @@ export function calculateEstimate(
   // ─── Penerbangan: sellingPrice × pilgrims ────────────────────────────────
   const flight = data.flights.find((f) => f.id === config.flightId)
   if (flight) {
-    const amount = flight.sellingPrice * pax
+    const unavailable = flight.sellingPrice === null
+    const amount = unavailable ? 0 : flight.sellingPrice! * pax
     categories.push({
       id: 'flight',
       label: 'Penerbangan',
@@ -78,8 +79,9 @@ export function calculateEstimate(
       lines: [
         {
           label: `${flight.airline} · ${flight.route}`,
-          detail: `${formatCurrency(flight.sellingPrice)} × ${pax} jamaah`,
+          detail: unavailable ? undefined : `${formatCurrency(flight.sellingPrice!)} × ${pax} jamaah`,
           amount,
+          unavailable,
         },
       ],
     })
@@ -115,11 +117,13 @@ export function calculateEstimate(
       .filter((r) => r.quantity > 0)
       .map((r) => {
         const rt = section.hotel!.roomTypes.find((t) => t.id === r.roomTypeId)
-        const amount = rt ? roundIDR(rt.pricePerNight * r.quantity * section.nights) : 0
+        const unavailable = !rt || rt.pricePerNight === null
+        const amount = unavailable ? 0 : roundIDR(rt!.pricePerNight! * r.quantity * section.nights)
         return {
           label: `${rt?.name ?? r.roomTypeId} × ${r.quantity} kamar · ${section.nights} malam`,
-          detail: rt ? `${formatCurrency(rt.pricePerNight)}/kamar/malam` : undefined,
+          detail: unavailable ? undefined : `${formatCurrency(rt!.pricePerNight!)}/kamar/malam`,
           amount,
+          unavailable,
         }
       })
     if (lines.length) {
@@ -138,10 +142,12 @@ export function calculateEstimate(
       const route = data.routeOptions.find((r) => r.id === sel.routeId)
       const option = route?.vehicles.find((v) => v.vehicle.id === sel.vehicleId)
       if (!route || !option) return null
+      const unavailable = option.price === null
       return {
         label: route.name,
         detail: option.vehicle.name,
-        amount: option.price,
+        amount: unavailable ? 0 : option.price!,
+        unavailable,
       }
     })
     .filter(Boolean) as EstimateCategory['lines']
@@ -157,7 +163,8 @@ export function calculateEstimate(
 
   // ─── Visa: pricePerPax × pilgrims (0 jika sudah punya) ──────────────────
   if (config.visa === 'needed') {
-    const amount = data.visa.pricePerPax * pax
+    const unavailable = data.visa.pricePerPax === null
+    const amount = unavailable ? 0 : data.visa.pricePerPax! * pax
     categories.push({
       id: 'visa',
       label: 'Visa Umroh',
@@ -165,8 +172,9 @@ export function calculateEstimate(
       lines: [
         {
           label: data.visa.name,
-          detail: `${formatCurrency(data.visa.pricePerPax)} × ${pax} jamaah`,
+          detail: unavailable ? undefined : `${formatCurrency(data.visa.pricePerPax!)} × ${pax} jamaah`,
           amount,
+          unavailable,
         },
       ],
     })
@@ -184,17 +192,21 @@ export function calculateEstimate(
     .map((sel) => {
       const svc = data.services.find((s) => s.id === sel.serviceId)
       if (!svc) return null
-      const amount =
-        svc.pricingUnit === 'pax'
-          ? svc.price * pax
-          : svc.price * sel.quantity // group_session | package
+      const unavailable = svc.price === null
+      const amount = unavailable
+        ? 0
+        : svc.pricingUnit === 'pax'
+          ? svc.price! * pax
+          : svc.price! * sel.quantity // group_session | package
       return {
         label: svc.name,
-        detail:
-          svc.pricingUnit === 'pax'
-            ? `${formatCurrency(svc.price)} × ${pax} jamaah`
-            : `${formatCurrency(svc.price)} × ${sel.quantity}`,
+        detail: unavailable
+          ? undefined
+          : svc.pricingUnit === 'pax'
+            ? `${formatCurrency(svc.price!)} × ${pax} jamaah`
+            : `${formatCurrency(svc.price!)} × ${sel.quantity}`,
         amount,
+        unavailable,
       }
     })
     .filter(Boolean) as EstimateCategory['lines']
@@ -210,10 +222,14 @@ export function calculateEstimate(
 
   // ─── Total ───────────────────────────────────────────────────────────────
   const total = categories.reduce((s, c) => s + c.amount, 0)
+  // M3.1: bila ada harga belum tersedia, total PREVIEW tidak valid — jangan
+  // tampilkan sebagai angka final (UI menampilkan "Perlu konfirmasi").
+  const hasUnavailable = categories.some((c) => c.lines.some((l) => l.unavailable))
 
   return {
     categories,
     total,
     perPerson: pax > 0 ? Math.round(total / pax) : 0,
+    hasUnavailable,
   }
 }

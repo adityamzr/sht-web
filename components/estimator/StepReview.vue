@@ -203,7 +203,7 @@ const fmt = (n: number) => 'Rp ' + n.toLocaleString('id-ID')
             </div>
             <div class="flex shrink-0 items-center gap-3">
               <p class="font-heading text-lg font-semibold text-brand-green">
-                {{ cat.amount > 0 ? formatCurrency(cat.amount) : 'Termasuk' }}
+                {{ cat.lines.some((l) => l.unavailable) ? 'Harga dikonfirmasi' : cat.amount > 0 ? formatCurrency(cat.amount) : 'Termasuk' }}
               </p>
               <button
                 v-if="editStepFor[cat.id]"
@@ -221,7 +221,7 @@ const fmt = (n: number) => 'Rp ' + n.toLocaleString('id-ID')
                 {{ line.label }}
                 <span v-if="line.detail" class="block text-xs text-neutral-charcoal/50">{{ line.detail }}</span>
               </span>
-              <span class="shrink-0 text-neutral-charcoal/80">{{ formatCurrency(line.amount) }}</span>
+              <span class="shrink-0 text-neutral-charcoal/80">{{ line.unavailable ? 'Harga dikonfirmasi' : formatCurrency(line.amount) }}</span>
             </li>
           </ul>
         </section>
@@ -233,9 +233,11 @@ const fmt = (n: number) => 'Rp ' + n.toLocaleString('id-ID')
           <div>
             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-soft">Total Estimasi</p>
             <p class="mt-2 font-heading text-3xl font-semibold sm:text-4xl" aria-live="polite">
-              {{ formatCurrency(breakdown.total) }}
+              <template v-if="breakdown.hasUnavailable">Perlu konfirmasi</template>
+              <template v-else>{{ formatCurrency(breakdown.total) }}</template>
             </p>
-            <p class="mt-1.5 text-sm text-white/70">± {{ formatCurrency(breakdown.perPerson) }} /orang</p>
+            <p v-if="!breakdown.hasUnavailable" class="mt-1.5 text-sm text-white/70">± {{ formatCurrency(breakdown.perPerson) }} /orang</p>
+            <p v-else class="mt-1.5 text-sm text-white/70">Sebagian harga perlu dikonfirmasi tim kami.</p>
           </div>
         </div>
         <p class="mt-5 border-t border-white/15 pt-4 text-xs leading-relaxed text-white/60">

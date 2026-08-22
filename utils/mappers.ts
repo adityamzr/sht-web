@@ -99,7 +99,8 @@ export function mapDepartureCity(c: ApiDepartureCity): DepartureCityOption {
     id,
     name: c.name,
     note: '',
-    feePerPax: c.feePerPaxIdr ?? 0,
+    // M3.1: TANPA fallback ke angka sumber — null = harga belum tersedia.
+    feePerPax: c.feePerPaxIdr,
   }
 }
 
@@ -108,13 +109,14 @@ function mapRoomType(r: ApiRoomType): RoomType {
     id: String(r.id),
     name: r.name,
     capacity: r.capacity,
-    pricePerNight: r.pricePerNightIdr ?? r.pricePerNight ?? 0,
+    // M3.1: harga IDR otoritatif SAJA — null dibiarkan null (jangan 1:1 ke angka sumber).
+    pricePerNight: r.pricePerNightIdr,
   }
 }
 
 export function mapHotel(h: ApiHotel): Hotel {
   const rooms = h.roomTypes.map(mapRoomType)
-  const prices = rooms.map((r) => r.pricePerNight).filter((p) => p > 0)
+  const prices = rooms.map((r) => r.pricePerNight).filter((p): p is number => p !== null)
   return {
     id: String(h.id),
     name: h.name,
@@ -124,7 +126,7 @@ export function mapHotel(h: ApiHotel): Hotel {
     description: h.description,
     coverImage: h.coverImage,
     gallery: h.coverImage ? [h.coverImage] : [],
-    startingPrice: prices.length ? Math.min(...prices) : 0,
+    startingPrice: prices.length ? Math.min(...prices) : null,
     currency: 'IDR',
     status: 'active',
     roomTypes: rooms,
@@ -140,13 +142,13 @@ export function mapFlight(f: ApiFlight): Flight {
     arrival: f.destination,
     type: f.flightType === 'Transit' ? 'Transit' : 'Direct',
     baggage: f.baggage,
-    sellingPrice: f.pricePerPaxIdr ?? f.pricePerPax ?? 0,
+    sellingPrice: f.pricePerPaxIdr,
     currency: 'IDR',
     status: 'active',
   }
 }
 
-function mapVehicle(v: ApiVehicle, price: number): Transportation {
+function mapVehicle(v: ApiVehicle, price: number | null): Transportation {
   return {
     id: String(v.id),
     name: v.name,
@@ -165,7 +167,8 @@ export function mapRouteOption(r: ApiRoute): TransportRouteOption {
     name: r.name,
     description: r.description,
     vehicles: r.vehicleOptions.map<RouteVehicleOption>((o) => {
-      const price = o.pricePerTripIdr ?? o.pricePerTrip ?? 0
+      // M3.1: IDR otoritatif SAJA — tanpa fallback ke angka sumber.
+      const price = o.pricePerTripIdr
       return { vehicle: mapVehicle(o.vehicle, price), price }
     }),
   }
@@ -178,7 +181,7 @@ export function mapService(s: ApiService): Service {
     code: s.code,
     name: s.name,
     description: s.description,
-    price: s.priceIdr ?? s.price ?? 0,
+    price: s.priceIdr,
     pricingUnit: unit as Service['pricingUnit'],
     image: '',
     status: 'active',
@@ -191,7 +194,7 @@ export function mapVisa(s: ApiService | undefined): VisaProduct | null {
     id: String(s.id),
     name: s.name,
     description: s.description,
-    pricePerPax: s.priceIdr ?? s.price ?? 0,
+    pricePerPax: s.priceIdr,
     currency: 'IDR',
   }
 }

@@ -38,7 +38,7 @@ const store = useEstimatorStore()
         <span class="font-heading text-lg font-semibold text-neutral-charcoal">{{ city.name }}</span>
         <span class="mt-2 block text-sm leading-relaxed text-neutral-charcoal/70">{{ city.note }}</span>
         <span
-          v-if="city.feePerPax > 0"
+          v-if="city.feePerPax !== null && city.feePerPax > 0"
           class="mt-3 inline-block rounded-full bg-gold-sand px-3 py-1 text-xs font-semibold text-neutral-charcoal"
         >
           + {{ formatCurrency(city.feePerPax) }}/orang

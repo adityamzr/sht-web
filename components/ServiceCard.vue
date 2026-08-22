@@ -18,8 +18,8 @@ const unitLabel: Record<Service['pricingUnit'], string> = {
     <h3 class="mt-5 font-heading text-xl font-semibold text-neutral-charcoal">{{ service.name }}</h3>
     <p class="mt-2.5 text-sm leading-relaxed text-neutral-charcoal/70">{{ service.description }}</p>
     <p class="mt-4 text-sm">
-      <span class="font-heading text-lg font-semibold text-brand-green">{{ formatCurrency(service.price, 'IDR') }}</span>
-      <span class="text-xs text-neutral-charcoal/60"> {{ unitLabel[service.pricingUnit] }}</span>
+      <span class="font-heading text-lg font-semibold text-brand-green">{{ formatPrice(service.price) }}</span>
+      <span v-if="service.price !== null" class="text-xs text-neutral-charcoal/60"> {{ unitLabel[service.pricingUnit] }}</span>
     </p>
   </article>
 </template>

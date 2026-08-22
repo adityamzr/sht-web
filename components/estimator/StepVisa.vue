@@ -56,7 +56,7 @@ const options = [
         <span class="mt-3 block font-heading text-base font-semibold text-brand-green">
           {{
             option.priceLabel
-              ?? (visaProduct
+              ?? (visaProduct && visaProduct.pricePerPax !== null
                 ? `${formatCurrency(visaProduct.pricePerPax)}/orang · ${pilgrims} jamaah`
                 : 'Harga dikonfirmasi tim kami')
           }}

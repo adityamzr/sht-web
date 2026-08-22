@@ -15,7 +15,9 @@ export interface RoomType {
   id: string // 'double' | 'triple' | 'quad'
   name: string // 'Double' | 'Triple' | 'Quad'
   capacity: number // jumlah orang per kamar
-  pricePerNight: number // selling price per kamar per malam
+  /** Harga jual per kamar/malam DALAM IDR (hasil konversi server).
+   *  null = tidak tersedia (mis. kurs hilang) — JANGAN fallback ke angka sumber. */
+  pricePerNight: number | null
 }
 
 export interface RoomSelection {
@@ -33,7 +35,8 @@ export interface Hotel {
   description: string
   coverImage: string
   gallery: string[]
-  startingPrice: number // selling price per room per malam
+  /** null = tidak ada harga IDR tersedia — tampilkan "Harga dikonfirmasi". */
+  startingPrice: number | null // selling price IDR per room per malam
   currency: Currency
   status: ProductStatus
   roomTypes: RoomType[]
@@ -48,7 +51,8 @@ export interface Flight {
   arrival: string
   type: 'Direct' | 'Transit'
   baggage: string // ex: "Bagasi 30 kg"
-  sellingPrice: number // per orang
+  /** null = harga IDR tidak tersedia (kurs hilang) — bukan Rp0, bukan angka sumber. */
+  sellingPrice: number | null // IDR per orang
   currency: Currency
   status: ProductStatus
 }
@@ -60,14 +64,15 @@ export interface Transportation {
   capacity: number // jumlah kursi/penumpang
   description: string
   image: string
-  price: number // selling price per trip (referensi katalog)
+  price: number | null // selling price IDR per trip (null = tidak tersedia)
   currency: Currency
   status: ProductStatus
 }
 
 export interface RouteVehicleOption {
   vehicle: Transportation
-  price: number // selling price untuk rute ini
+  /** null = harga IDR tidak tersedia untuk kombinasi rute ini. */
+  price: number | null // selling price IDR untuk rute ini
 }
 
 export interface TransportRouteOption {
@@ -87,7 +92,8 @@ export interface VisaProduct {
   id: string
   name: string
   description: string
-  pricePerPax: number
+  /** null = harga IDR tidak tersedia (kurs hilang). */
+  pricePerPax: number | null
   currency: Currency
 }
 
@@ -99,7 +105,8 @@ export interface Service {
   code: string | null // slug backend ('visa', 'muthawwif', ...)
   name: string
   description: string
-  price: number // selling price
+  /** null = harga IDR tidak tersedia (kurs hilang). */
+  price: number | null // selling price IDR
   pricingUnit: 'pax' | 'group_session' | 'package' // lihat Master Context §7
   image: string
   status: ProductStatus
@@ -117,7 +124,8 @@ export interface DepartureCityOption {
   id: DepartureCityId
   name: string
   note: string
-  feePerPax: number // selling price per pax (0 untuk Jakarta)
+  /** null = biaya belum bisa ditentukan (kurs hilang); 0 = gratis. */
+  feePerPax: number | null // selling price IDR per pax (0 untuk Jakarta)
 }
 
 // ─── Content ─────────────────────────────────────────────────────────────────
@@ -159,6 +167,8 @@ export interface EstimateLine {
   label: string
   detail?: string
   amount: number
+  /** true = harga komponen ini belum tersedia (jangan tampilkan sebagai Rp0). */
+  unavailable?: boolean
 }
 
 export interface EstimateCategory {
@@ -179,6 +189,8 @@ export interface EstimatorBreakdown {
   categories: EstimateCategory[]
   total: number
   perPerson: number
+  /** true = ada komponen dengan harga tidak tersedia — total PREVIEW belum final. */
+  hasUnavailable: boolean
 }
 
 // ─── M3: hasil submit estimasi (nilai otoritatif dari backend) ───────────────
