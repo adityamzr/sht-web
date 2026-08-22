@@ -4,8 +4,8 @@
  * Narasi homepage: Hero ("tidak harus repot sendiri") → bagian ini
  * ("apa yang perlu saya persiapkan?"). BUKAN katalog layanan, BUKAN grid kartu.
  *
- * COPY = PROVISIONAL (belum dikunci) — semua teks berada di array `steps`
- * dan `closing` di bawah agar mudah direvisi Product Owner tanpa mengubah struktur.
+ * COPY M4A.2.1 = finalized — teks timeline berada di array `steps`
+ * agar dapat direvisi Product Owner tanpa mengubah struktur visual.
  *
  * Animasi = progressive enhancement (IntersectionObserver + CSS, tanpa library):
  * - mobile: rail gold mengisi mengikuti scroll; node aktif saat step masuk viewport.
@@ -24,32 +24,30 @@ interface PrepStep {
 const steps: PrepStep[] = [
   {
     number: '01',
-    title: 'Tentukan Jadwal Perjalanan',
-    description: 'Tentukan kapan berangkat, berapa lama perjalanan, serta pembagian waktu di Makkah dan Madinah.',
-    link: { label: 'Atur perjalanan', to: '/estimator' },
+    title: 'Susun Rencana',
+    description: 'Tentukan waktu keberangkatan, durasi, serta pembagian hari di Makkah dan Madinah.',
+    link: { label: 'Mulai susun perjalanan', to: '/estimator' },
   },
   {
     number: '02',
-    title: 'Siapkan Penerbangan',
-    description: 'Pilih penerbangan yang sesuai dengan waktu perjalanan dan kebutuhan Anda atau rombongan.',
-    link: { label: 'Lihat penerbangan', to: '/flights' },
+    title: 'Siapkan Dokumen',
+    description: 'Pastikan paspor, visa, dan dokumen pendukung lainnya sudah siap sebelum keberangkatan.',
   },
   {
     number: '03',
-    title: 'Pilih Hotel',
-    description: 'Pilih hotel di Makkah dan Madinah berdasarkan lokasi, kebutuhan kamar, kenyamanan, dan anggaran.',
-    link: { label: 'Lihat hotel', to: '/hotels' },
+    title: 'Atur Perjalanan dan Akomodasi',
+    description: 'Pilih penerbangan, hotel, transportasi antar kota, airport transfer, dan kebutuhan perjalanan darat lainnya.',
+    link: { label: 'Mulai susun perjalanan', to: '/estimator' },
   },
   {
     number: '04',
-    title: 'Atur Transportasi',
-    description: 'Siapkan transportasi untuk perjalanan antar kota, airport transfer, dan kebutuhan perjalanan lokal.',
-    link: { label: 'Lihat transportasi', to: '/transportation' },
+    title: 'Pelajari Manasik Umroh',
+    description: 'Pahami tata cara Umroh, rukun, wajib, larangan ihram, serta hal penting sebelum menjalankan ibadah.',
   },
   {
     number: '05',
-    title: 'Lengkapi Kebutuhan Umroh',
-    description: 'Lengkapi kebutuhan seperti visa, muthawwif, handling, perlengkapan, dan layanan pendukung lainnya.',
+    title: 'Lengkapi Kebutuhan Pendukung',
+    description: 'Siapkan muthawwif, handling, perlengkapan, ziarah, dan kebutuhan tambahan lainnya sesuai rencana Anda.',
     link: { label: 'Lihat layanan', to: '/services' },
   },
 ]
@@ -158,11 +156,10 @@ onBeforeUnmount(() => {
           PERSIAPAN UMROH MANDIRI
         </p>
         <h2 id="prep-heading" class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
-          Umroh Mandiri Dimulai dari Beberapa Kebutuhan Utama.
+          Apa Saja yang Perlu Disiapkan untuk Umroh Mandiri?
         </h2>
         <p class="mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75">
-          Anda tidak harus menyiapkan semuanya sekaligus. Kenali dulu komponen perjalanan yang biasanya dibutuhkan,
-          lalu tentukan bagian mana yang ingin Anda atur sendiri dan mana yang ingin dibantu Sudut Haramain.
+          Tidak perlu memahami semuanya sekaligus. Kenali dulu kebutuhan perjalanan, dokumen, manasik, dan layanan pendukung agar persiapan Umroh lebih terarah.
         </p>
       </div>
 
