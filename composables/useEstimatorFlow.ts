@@ -12,7 +12,7 @@ export interface EstimatorDatasets {
   flights: Flight[]
   hotels: Hotel[]
   routeOptions: TransportRouteOption[]
-  visa: VisaProduct
+  visa: VisaProduct | null
   services: Service[]
   departureCities: DepartureCityOption[]
 }
@@ -53,26 +53,27 @@ export const ESTIMATOR_STEPS: EstimatorStepMeta[] = [
 ]
 
 /**
- * Flow orchestrator estimator:
- * - validasi per langkah (pesan ramah, tanpa istilah teknis)
- * - breakdown estimasi (delegasi ke utils/estimatorCalculator — terisolasi)
- * - sanitasi silang (ex: kendaraan tak cukup saat jamaah bertambah)
+ * Flow orchestrator estimator (M3 — data dari API backend, lazy).
+ * getData: fungsi yang mengembalikan dataset terkini (refs dari composable).
+ * - validasi per langkah (pesan ramah)
+ * - breakdown PREVIEW (kalkulasi client — HANYA indikatif; hasil akhir
+ *   selalu dihitung ulang backend saat submit)
+ * - sanitasi silang (kendaraan tak cukup saat jamaah bertambah)
  */
-export function useEstimatorFlow(data: EstimatorDatasets) {
+export function useEstimatorFlow(getData: () => EstimatorDatasets) {
   const store = useEstimatorStore()
+  const data = computed(getData)
 
   // Layanan tambahan di estimator tidak termasuk visa (ditangani step khusus).
-  const additionalServices = computed(() => data.services.filter((s) => s.id !== 'SRV-001'))
+  const additionalServices = computed(() => data.value.services.filter((s) => s.code !== 'visa'))
 
-  const makkahHotels = computed(() => data.hotels.filter((h) => h.city === 'Makkah'))
-  const madinahHotels = computed(() => data.hotels.filter((h) => h.city === 'Madinah'))
+  const makkahHotels = computed(() => data.value.hotels.filter((h) => h.city === 'Makkah'))
+  const madinahHotels = computed(() => data.value.hotels.filter((h) => h.city === 'Madinah'))
 
-  const selectedFlight = computed(() => data.flights.find((f) => f.id === store.flightId))
-  const makkahHotel = computed(() => data.hotels.find((h) => h.id === store.makkahHotelId))
-  const madinahHotel = computed(() => data.hotels.find((h) => h.id === store.madinahHotelId))
-  const departure = computed(() =>
-    data.departureCities.find((c) => c.id === store.departureCity),
-  )
+  const selectedFlight = computed(() => data.value.flights.find((f) => f.id === store.flightId))
+  const makkahHotel = computed(() => data.value.hotels.find((h) => h.id === store.makkahHotelId))
+  const madinahHotel = computed(() => data.value.hotels.find((h) => h.id === store.madinahHotelId))
+  const departure = computed(() => data.value.departureCities.find((c) => c.id === store.departureCity))
 
   const makkahCapacity = computed(() =>
     roomCapacity(makkahHotel.value, store.makkahRooms.filter((r) => r.quantity > 0)),
@@ -85,7 +86,7 @@ export function useEstimatorFlow(data: EstimatorDatasets) {
   watch(
     () => store.pilgrims,
     (pax) => {
-      const validIds = data.routeOptions
+      const validIds = data.value.routeOptions
         .flatMap((r) => r.vehicles)
         .filter((v) => v.vehicle.capacity >= pax)
         .map((v) => v.vehicle.id)
@@ -96,15 +97,21 @@ export function useEstimatorFlow(data: EstimatorDatasets) {
   const nightsAssigned = computed(() => store.makkahNights + store.madinahNights)
   const nightsRemaining = computed(() => store.maxNights - nightsAssigned.value)
 
-  /** Breakdown live — dikonsumsi summary & review. */
+  /** Breakdown live (PREVIEW) — dikonsumsi summary & review. */
   const breakdown = computed(() =>
     calculateEstimate(store.configuration, {
-      flights: data.flights,
-      hotels: data.hotels,
-      routeOptions: data.routeOptions,
-      visa: data.visa,
-      services: data.services,
-      departureCities: data.departureCities,
+      flights: data.value.flights,
+      hotels: data.value.hotels,
+      routeOptions: data.value.routeOptions,
+      visa: data.value.visa ?? {
+        id: 'visa',
+        name: 'Visa Umroh',
+        description: '',
+        pricePerPax: 0,
+        currency: 'IDR',
+      },
+      services: data.value.services,
+      departureCities: data.value.departureCities,
     }),
   )
 
@@ -174,7 +181,7 @@ export function useEstimatorFlow(data: EstimatorDatasets) {
       case 10: {
         const pending = store.transport.find((t) => t.vehicleId === null)
         if (pending) {
-          const route = data.routeOptions.find((r) => r.id === pending.routeId)
+          const route = data.value.routeOptions.find((r) => r.id === pending.routeId)
           return `Silakan pilih kendaraan untuk rute ${route?.name ?? 'tersebut'}.`
         }
         return null
@@ -200,14 +207,14 @@ export function useEstimatorFlow(data: EstimatorDatasets) {
   return {
     store,
     steps: ESTIMATOR_STEPS,
-    // data terfilter
+    // data terfilter (refs — template bisa langsung pakai)
     additionalServices,
     makkahHotels,
     madinahHotels,
-    routeOptions: data.routeOptions,
-    flights: data.flights,
-    visaProduct: data.visa,
-    departureCities: data.departureCities,
+    routeOptions: computed(() => data.value.routeOptions),
+    flights: computed(() => data.value.flights),
+    visaProduct: computed(() => data.value.visa),
+    departureCities: computed(() => data.value.departureCities),
     // seleksi terkini
     selectedFlight,
     makkahHotel,

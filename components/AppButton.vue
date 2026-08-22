@@ -13,8 +13,9 @@ const props = withDefaults(
     external?: boolean
     block?: boolean
     type?: 'button' | 'submit'
+    disabled?: boolean
   }>(),
-  { variant: 'primary', size: 'md', external: false, block: false, type: 'button' },
+  { variant: 'primary', size: 'md', external: false, block: false, type: 'button', disabled: false },
 )
 
 const base =
@@ -40,6 +41,7 @@ const classes = computed(() => [
   variants[props.variant],
   sizes[props.size],
   props.block ? 'w-full' : '',
+  props.disabled ? 'pointer-events-none opacity-50' : '',
 ])
 </script>
 

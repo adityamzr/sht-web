@@ -10,33 +10,31 @@ useSeoMeta({
 const store = useEstimatorStore()
 store.reset() // mulai bersih setiap masuk halaman estimator
 
-// Data-access layer — Phase 3: diganti panggilan API, komponen tidak berubah.
-const { fetchFlights } = useFlights()
-const { fetchHotels } = useHotels()
-const { fetchServices } = useServices()
-const { fetchTransportRouteOptions } = useTransportations()
-const { fetchVisaProduct } = useVisa()
-const { fetchDepartureCities } = useDepartures()
+// Data nyata dari backend (sht-admin) — composable memuat via /api/v1.
+const { hotels, pending: hotelsPending, error: hotelsError, refresh: refreshHotels } = useHotels()
+const { flights, pending: flightsPending, error: flightsError, refresh: refreshFlights } = useFlights()
+const { routeOptions, pending: transportPending, error: transportError, refresh: refreshTransport } = useTransportations()
+const { services, pending: servicesPending, error: servicesError, refresh: refreshServices } = useServices()
+const { visa, pending: visaPending, error: visaError, refresh: refreshVisa } = useVisa()
+const { cities, pending: citiesPending, error: citiesError, refresh: refreshCities } = useDepartures()
 
-const [flights, hotels, services, routeOptions, visa, departureCities] = await Promise.all([
-  fetchFlights(),
-  fetchHotels(),
-  fetchServices(),
-  fetchTransportRouteOptions(),
-  fetchVisaProduct(),
-  fetchDepartureCities(),
-])
+const isPending = computed(
+  () => hotelsPending.value || flightsPending.value || transportPending.value || servicesPending.value || visaPending.value || citiesPending.value,
+)
+const loadError = computed(
+  () =>
+    hotelsError.value || flightsError.value || transportError.value || servicesError.value || visaError.value || citiesError.value || null,
+)
 
-const datasets = {
-  flights,
-  hotels,
-  routeOptions,
-  visa,
-  services,
-  departureCities,
-}
+const flow = useEstimatorFlow(() => ({
+  hotels: hotels.value,
+  flights: flights.value,
+  routeOptions: routeOptions.value,
+  visa: visa.value,
+  services: services.value,
+  departureCities: cities.value,
+}))
 
-const flow = useEstimatorFlow(datasets)
 const {
   steps,
   breakdown,
@@ -75,6 +73,14 @@ function onEdit(step: number) {
 function scrollToTop() {
   if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+function onRetry() {
+  refreshHotels()
+  refreshFlights()
+  refreshTransport()
+  refreshServices()
+  refreshVisa()
+  refreshCities()
+}
 </script>
 
 <template>
@@ -95,7 +101,30 @@ function scrollToTop() {
       </Container>
     </section>
 
-    <section class="py-10 sm:py-12">
+    <!-- Loading -->
+    <section v-if="isPending" class="py-24">
+      <Container>
+        <div class="mx-auto max-w-md rounded-card border border-neutral-line bg-white p-10 text-center shadow-card">
+          <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand-sky border-t-brand-green" aria-hidden="true" />
+          <p class="mt-4 text-sm font-medium text-neutral-charcoal/70">Memuat pilihan perjalanan Anda…</p>
+        </div>
+      </Container>
+    </section>
+
+    <!-- Error load -->
+    <section v-else-if="loadError" class="py-24">
+      <Container>
+        <div class="mx-auto max-w-md rounded-card border border-gold-soft bg-gold-sand/50 p-10 text-center">
+          <p class="font-heading text-lg font-semibold">Koneksi terganggu</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">
+            Kami kesulitan memuat data perjalanan. Silakan coba lagi dalam beberapa saat.
+          </p>
+          <AppButton variant="primary" class="mt-5" @click="onRetry"> Coba Lagi </AppButton>
+        </div>
+      </Container>
+    </section>
+
+    <section v-else class="py-10 sm:py-12">
       <Container>
         <ProgressBar
           :current="store.currentStep"
@@ -120,7 +149,7 @@ function scrollToTop() {
           <!-- Kolom kiri: step aktif -->
           <div>
             <StepPilgrims v-if="currentMeta.id === 'pilgrims'" />
-            <StepDeparture v-else-if="currentMeta.id === 'departure'" :cities="datasets.departureCities" />
+            <StepDeparture v-else-if="currentMeta.id === 'departure'" :cities="cities" />
             <StepSchedule v-else-if="currentMeta.id === 'schedule'" />
             <StepNights
               v-else-if="currentMeta.id === 'nights'"
@@ -160,10 +189,10 @@ function scrollToTop() {
             />
             <StepTransport
               v-else-if="currentMeta.id === 'transport'"
-              :route-options="datasets.routeOptions"
+              :route-options="routeOptions"
               :pilgrims="store.pilgrims"
             />
-            <StepVisa v-else-if="currentMeta.id === 'visa'" :visa-product="datasets.visa" :pilgrims="store.pilgrims" />
+            <StepVisa v-else-if="currentMeta.id === 'visa'" :visa-product="visa" :pilgrims="store.pilgrims" />
             <StepServices v-else-if="currentMeta.id === 'services'" :services="additionalServices" :pilgrims="store.pilgrims" />
 
             <NavButtons
@@ -189,7 +218,7 @@ function scrollToTop() {
 
     <!-- Sticky summary (mobile) -->
     <MobileSummaryBar
-      v-if="!isReview"
+      v-if="!isReview && !isPending && !loadError"
       :breakdown="breakdown"
       :pilgrims="store.pilgrims"
       :duration-days="store.durationDays"

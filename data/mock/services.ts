@@ -7,6 +7,7 @@ import type { Service } from '~/types'
 export const mockServices: Service[] = [
   {
     id: 'SRV-001',
+    code: 'visa',
     name: 'Visa Umroh',
     description:
       'Pengurusan visa umroh resmi sampai terbit, termasuk asuransi perjalanan selama di Saudi.',
@@ -17,6 +18,7 @@ export const mockServices: Service[] = [
   },
   {
     id: 'SRV-002',
+    code: 'muthawwif',
     name: 'Muthowwif / Pendamping',
     description:
       'Pendamping ibadah berbahasa Indonesia — menemani dari niat hingga tahallul dengan tenang.',
@@ -27,6 +29,7 @@ export const mockServices: Service[] = [
   },
   {
     id: 'SRV-003',
+    code: 'perlengkapan',
     name: 'Perlengkapan Umroh',
     description:
       'Koper, kain ihram/mukena, buku doa, dan kebutuhan perjalanan ibadah lainnya.',
@@ -37,6 +40,7 @@ export const mockServices: Service[] = [
   },
   {
     id: 'SRV-004',
+    code: 'handling',
     name: 'Handling Bandara',
     description:
       'Pendampingan check-in, bagasi, hingga proses kedatangan di Jeddah/Madinah.',

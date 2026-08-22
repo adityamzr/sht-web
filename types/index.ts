@@ -96,6 +96,7 @@ export type VisaChoice = 'owned' | 'needed'
 // ─── Additional Service ──────────────────────────────────────────────────────
 export interface Service {
   id: string
+  code: string | null // slug backend ('visa', 'muthawwif', ...)
   name: string
   description: string
   price: number // selling price
@@ -178,4 +179,39 @@ export interface EstimatorBreakdown {
   categories: EstimateCategory[]
   total: number
   perPerson: number
+}
+
+// ─── M3: hasil submit estimasi (nilai otoritatif dari backend) ───────────────
+export interface EstimationSubmitItem {
+  category: string
+  label: string
+  detail: string | null
+  unit: string | null
+  quantity: number | null
+  amount: number
+}
+
+export interface EstimationSubmitResult {
+  estimationNumber: string
+  status: string
+  totalAmount: number
+  perPersonAmount: number
+  currency: string
+  trip: {
+    pilgrims: number
+    departureCity: string
+    departureDate: string
+    returnDate: string
+    durationDays: number
+    makkahNights: number
+    madinahNights: number
+    visa: 'needed' | 'owned'
+  }
+  items: EstimationSubmitItem[]
+  leadId: number
+}
+
+export interface ServiceInquiryResult {
+  id: number
+  status: string
 }

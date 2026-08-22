@@ -8,14 +8,10 @@ useSeoMeta({
   ogImage: '/images/hero-makkah.jpg',
 })
 
-const { fetchFeaturedHotels } = useHotels()
+const { featured, pending: hotelsPending, error: hotelsError } = useHotels()
 const { fetchTestimonials, fetchFaqs } = useContent()
 
-const [hotels, testimonials, faqs] = await Promise.all([
-  fetchFeaturedHotels(3),
-  fetchTestimonials(),
-  fetchFaqs(),
-])
+const [testimonials, faqs] = await Promise.all([fetchTestimonials(), fetchFaqs()])
 
 const whyPoints = [
   {
@@ -179,8 +175,14 @@ const serviceCards = [
           />
           <AppButton to="/hotels" variant="outline" class="shrink-0"> Lihat Katalog Hotel </AppButton>
         </div>
-        <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <HotelCard v-for="hotel in hotels" :key="hotel.id" :hotel="hotel" />
+        <div v-if="hotelsPending" class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="n in 3" :key="n" class="h-64 animate-pulse rounded-card bg-neutral-line/40" aria-hidden="true" />
+        </div>
+        <div v-else-if="hotelsError" class="mt-12 rounded-card border border-gold-soft bg-gold-sand/50 p-6 text-center">
+          <p class="text-sm text-neutral-charcoal/70">Katalog hotel sedang tidak dapat dimuat. Silakan kunjungi halaman hotel atau coba lagi nanti.</p>
+        </div>
+        <div v-else class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <HotelCard v-for="hotel in featured" :key="hotel.id" :hotel="hotel" />
         </div>
       </Container>
     </section>

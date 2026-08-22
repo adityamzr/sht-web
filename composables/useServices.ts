@@ -1,10 +1,15 @@
-import { mockServices } from '~/data/mock/services'
 import type { Service } from '~/types'
+import { mapService, type ApiService } from '~/utils/mappers'
 
-/** Data-access layer — SERVICE. Phase berikutnya: GET /api/services */
+/** Data-access layer — SERVICE (GET /api/v1/services, sht-admin). */
 export function useServices() {
-  const fetchServices = async (): Promise<Service[]> =>
-    mockServices.filter((s) => s.status === 'active')
+  const config = useRuntimeConfig()
+  const { data, pending, error, refresh } = useFetch<{ data: ApiService[] }>(
+    `${config.public.apiBaseUrl}/api/v1/services`,
+    { default: () => ({ data: [] }) },
+  )
 
-  return { fetchServices }
+  const services = computed<Service[]>(() => (data.value?.data ?? []).map(mapService))
+
+  return { services, pending, error, refresh }
 }

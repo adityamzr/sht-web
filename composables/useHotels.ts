@@ -1,18 +1,20 @@
-import { mockHotels } from '~/data/mock/hotels'
 import type { Hotel } from '~/types'
+import { mapHotel, type ApiHotel } from '~/utils/mappers'
 
 /**
  * Data-access layer — HOTEL.
- * UI TIDAK mengimpor mock langsung; cukup memanggil composable ini.
- * Phase berikutnya: ganti isi fungsi dengan `await $fetch('/api/hotels')`
- * tanpa menyentuh satu pun komponen UI.
+ * M3: data nyata dari sht-admin (GET /api/v1/hotels).
+ * Komponen hanya memakai refs di sini; mapper menormalkan payload backend.
  */
 export function useHotels() {
-  // Simulasi async boundary seperti pemanggilan API sungguhan.
-  const fetchHotels = async (): Promise<Hotel[]> => mockHotels.filter((h) => h.status === 'active')
+  const config = useRuntimeConfig()
+  const { data, pending, error, refresh } = useFetch<{ data: ApiHotel[] }>(
+    `${config.public.apiBaseUrl}/api/v1/hotels`,
+    { default: () => ({ data: [] }) },
+  )
 
-  const fetchFeaturedHotels = async (limit = 3): Promise<Hotel[]> =>
-    (await fetchHotels()).slice(0, limit)
+  const hotels = computed<Hotel[]>(() => (data.value?.data ?? []).map(mapHotel))
+  const featured = computed<Hotel[]>(() => hotels.value.slice(0, 3))
 
-  return { fetchHotels, fetchFeaturedHotels }
+  return { hotels, featured, pending, error, refresh }
 }

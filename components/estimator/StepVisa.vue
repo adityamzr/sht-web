@@ -2,7 +2,7 @@
 import type { VisaProduct } from '~/types'
 
 defineProps<{
-  visaProduct: VisaProduct
+  visaProduct: VisaProduct | null
   pilgrims: number
 }>()
 
@@ -54,7 +54,12 @@ const options = [
         <span class="block font-heading text-lg font-semibold text-neutral-charcoal">{{ option.title }}</span>
         <span class="mt-2 block text-sm leading-relaxed text-neutral-charcoal/70">{{ option.description }}</span>
         <span class="mt-3 block font-heading text-base font-semibold text-brand-green">
-          {{ option.priceLabel ?? `${formatCurrency(visaProduct.pricePerPax)}/orang · ${pilgrims} jamaah` }}
+          {{
+            option.priceLabel
+              ?? (visaProduct
+                ? `${formatCurrency(visaProduct.pricePerPax)}/orang · ${pilgrims} jamaah`
+                : 'Harga dikonfirmasi tim kami')
+          }}
         </span>
       </button>
     </div>

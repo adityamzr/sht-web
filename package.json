@@ -8,7 +8,7 @@
     "dev": "nuxt dev --host 0.0.0.0",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "test": "tsx tests/estimator-calculator.test.ts",
+    "test": "tsx tests/estimator-calculator.test.ts && tsx --test tests/wa-message.test.ts tests/submit-payload.test.ts",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {

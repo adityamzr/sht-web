@@ -46,6 +46,10 @@ export default defineNuxtConfig({
       // NUXT_PUBLIC_WHATSAPP_NUMBER dan NUXT_PUBLIC_SITE_URL, lihat .env.example).
       whatsappNumber: '6281234567890', // PLACEHOLDER — ganti dengan nomor resmi SHT
       siteUrl: 'https://sudutharamain.id',
+
+      // Base URL backend SHT (sht-admin). Development: http://localhost:3001.
+      // Production: set NUXT_PUBLIC_API_BASE_URL di environment Vercel.
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3001',
     },
   },
 
