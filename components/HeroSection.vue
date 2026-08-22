@@ -1,57 +1,73 @@
 <script setup lang="ts">
-const waUrl = whatsappLink()
+// Hero — positioning publik saat ini: UMROH MANDIRI & LAND ARRANGEMENT (M4A.1).
+// Copy terkunci; komposisi full-width Ka'bah + overlay kiri gelap.
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-sky-gradient">
+  <section class="relative isolate overflow-hidden bg-brand-green">
+    <!-- Background: aset Ka'bah existing (dekoratif — informasi tidak bergantung padanya) -->
+    <img
+      src="/images/hero-makkah.jpg"
+      alt=""
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 h-full w-full object-cover object-center"
+      loading="eager"
+      fetchpriority="high"
+      @error="($event.target as HTMLImageElement).src = '/images/kaaba-tawaf.jpg'"
+    />
+
+    <!-- Overlay: kiri deep-green solid → kanan transparan (readability tanpa menghilangkan gambar) -->
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-green/95 via-brand-green/70 to-brand-green/15 sm:to-brand-green/5"
+    />
+    <!-- Sentuhan bawah agar transisi ke section berikutnya tenang -->
+    <div aria-hidden="true" class="absolute inset-x-0 bottom-0 -z-10 h-20 bg-gradient-to-t from-brand-green/60 to-transparent" />
+
     <Container>
-      <div class="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
-        <!-- Copy -->
-        <div class="order-2 lg:order-1">
-          <p class="inline-flex items-center gap-2 rounded-full border border-brand-teal/30 bg-white/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-green">
-            <span class="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
-            Umroh Private &amp; Custom Journey
-          </p>
-          <h1 class="mt-5 font-heading text-4xl font-semibold leading-[1.15] text-neutral-charcoal text-balance sm:text-5xl lg:text-[3.4rem]">
-            Umroh Private,<br />Sesuai Cara Anda.
-          </h1>
-          <p class="mt-5 max-w-lg text-base leading-relaxed text-neutral-charcoal/70 sm:text-lg">
-            Susun perjalanan Umroh bersama keluarga atau orang-orang terdekat Anda. Kami bantu
-            siapkan kebutuhan perjalanan dari visa, penerbangan, hotel hingga transportasi.
-          </p>
-          <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <AppButton to="/estimator" variant="primary" size="lg" block class="sm:w-auto">
-              Hitung Estimasi Umroh
-            </AppButton>
-            <AppButton :href="waUrl" variant="whatsapp" size="lg" external block class="sm:w-auto">
-              Konsultasi via WhatsApp
-            </AppButton>
-          </div>
-          <p class="mt-5 text-xs text-neutral-charcoal/50">
-            Estimasi gratis · Dijawab konsultan manusia, bukan bot · Tanpa komitmen
-          </p>
+      <div class="max-w-2xl py-16 sm:py-24 lg:py-32">
+        <!-- Eyebrow -->
+        <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-gold-soft">
+          <span class="h-px w-8 bg-gold" aria-hidden="true" />
+          UMROH MANDIRI &amp; LAND ARRANGEMENT
+        </p>
+
+        <!-- Headline -->
+        <h1
+          class="mt-5 font-heading text-[1.9rem] font-semibold leading-[1.15] text-white text-balance sm:text-5xl sm:leading-[1.12] lg:text-[3.5rem]"
+        >
+          Jalani Umroh Mandiri,<br class="hidden sm:block" />
+          Tanpa Harus Repot Sendiri.
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+          Atur perjalanan Umroh sesuai kebutuhan Anda. Sudut Haramain membantu menyiapkan hotel, transportasi, visa,
+          muthawwif, handling, dan berbagai kebutuhan perjalanan lainnya.
+        </p>
+
+        <!-- CTA -->
+        <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <AppButton to="/estimator" variant="gold" size="lg" block class="sm:w-auto">
+            Persiapkan Perjalanan Saya
+          </AppButton>
+          <NuxtLink
+            to="/services"
+            class="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-white/40 px-7 py-3.5 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-soft sm:w-auto"
+          >
+            Lihat Layanan
+          </NuxtLink>
         </div>
 
-        <!-- Visual -->
-        <div class="order-1 lg:order-2">
-          <div class="relative">
-            <div class="absolute -inset-3 rounded-[2rem] bg-gold-sand/60 blur-xl" aria-hidden="true" />
-            <img
-              src="/images/hero-makkah.jpg"
-              alt="Ka'bah di Masjidil Haram, Makkah, dengan Menara Jam di latar belakang"
-              class="relative aspect-[4/3] w-full rounded-[1.5rem] object-cover shadow-card-hover sm:aspect-[5/4]"
-              loading="eager"
-              fetchpriority="high"
-              @error="($event.target as HTMLImageElement).src = '/images/kaaba-tawaf.jpg'"
-            />
-            <!-- Floating card -->
-            <div class="absolute -bottom-5 left-4 right-4 rounded-card bg-white p-4 shadow-card-hover sm:left-6 sm:right-auto sm:w-72">
-              <p class="text-xs font-semibold uppercase tracking-wider text-gold">Mulai dari</p>
-              <p class="mt-1 font-heading text-xl font-semibold text-brand-green">Rp 26 jt-an <span class="font-sans text-xs font-normal text-neutral-charcoal/60">/orang</span></p>
-              <p class="mt-1 text-xs text-neutral-charcoal/60">Umroh private 9 hari, hotel bintang 5 dekat Haram</p>
-            </div>
-          </div>
-        </div>
+        <!-- Reassurance (subtle) -->
+        <ul class="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3" aria-label="Keunggulan Sudut Haramain">
+          <li v-for="point in ['Fleksibel sesuai kebutuhan', 'Estimasi transparan', 'Dibantu tim berpengalaman']" :key="point" class="flex items-center gap-2.5">
+            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold-soft" aria-hidden="true">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg>
+            </span>
+            <span class="text-sm font-medium text-white/80">{{ point }}</span>
+          </li>
+        </ul>
       </div>
     </Container>
   </section>

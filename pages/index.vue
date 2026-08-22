@@ -1,10 +1,11 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Sudut Haramain Tour — Umroh Private, Sesuai Cara Anda',
+  title: 'Sudut Haramain Tour — Umroh Mandiri & Land Arrangement',
   description:
-    'Rencanakan Umroh private Anda sendiri: pilih jadwal, hotel, penerbangan, dan layanan. Sudut Haramain Tour menyiapkan semuanya — tenang, jelas, dan terpercaya.',
-  ogTitle: 'Sudut Haramain Tour — Umroh Private, Sesuai Cara Anda',
-  ogDescription: 'Susun perjalanan Umroh sesuai cara Anda. Kami siapkan visa, penerbangan, hotel, hingga transportasi.',
+    'Jalani Umroh mandiri tanpa repot sendiri. Sudut Haramain membantu menyiapkan hotel, transportasi, visa, muthawwif, handling, dan berbagai kebutuhan perjalanan lainnya — sesuai rencana Anda.',
+  ogTitle: 'Sudut Haramain Tour — Umroh Mandiri & Land Arrangement',
+  ogDescription:
+    'Jalani Umroh mandiri tanpa repot sendiri. Hotel, transportasi, visa, muthawwif, handling — kami bantu siapkan sesuai kebutuhan perjalanan Anda.',
   ogImage: '/images/hero-makkah.jpg',
 })
 

@@ -14,14 +14,14 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'id' },
-      title: 'Sudut Haramain Tour — Umroh Private, Sesuai Cara Anda',
+      title: 'Sudut Haramain Tour — Umroh Mandiri & Land Arrangement',
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       meta: [
         {
           name: 'description',
           content:
-            'Sudut Haramain Tour membantu Anda merencanakan Umroh private sesuai cara Anda — visa, penerbangan, hotel, hingga transportasi, dalam satu rencana perjalanan.',
+            'Jalani Umroh mandiri tanpa repot sendiri. Sudut Haramain Tour membantu menyiapkan hotel, transportasi, visa, muthawwif, handling, dan kebutuhan perjalanan lainnya.',
         },
         { property: 'og:site_name', content: 'Sudut Haramain Tour' },
         { property: 'og:type', content: 'website' },
