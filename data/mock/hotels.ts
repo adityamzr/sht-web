@@ -1,7 +1,7 @@
 import type { Hotel } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/hotels (Laravel) di fase berikutnya.
+ * MOCK DATA — akan digantikan response GET /api/hotels (SHT REST API — sht-admin) di fase berikutnya.
  * Harga = SELLING PRICE (supplier cost/markup tidak pernah masuk sini).
  * roomTypes: Double/Triple/Quad dengan harga per kamar per malam.
  */

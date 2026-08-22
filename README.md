@@ -2,12 +2,17 @@
 
 Website publik **Sudut Haramain Tour (SHT)** — Umroh Private, Sesuai Cara Anda.
 
+## Branch Baseline
+
+- **`dev`** = baseline pengembangan aktif (mode interim pre-production, lihat [DEVFLOW.md](./DEVFLOW.md)).
+- **`main`** = production, protected — jangan push/merge langsung.
+
 ## Tech Stack
 
 - **Nuxt 3** + **TypeScript**
 - **Tailwind CSS** (design tokens mengikuti SHT UI Guidance)
 - **Pinia** (state bila dibutuhkan, ex: draft estimator)
-- Mock data lokal — siap diganti Laravel REST API tanpa mengubah UI
+- Mock data lokal — siap diganti SHT REST API (dari `sht-admin`, Nuxt/Nitro) tanpa mengubah UI
 
 ## Struktur Penting
 

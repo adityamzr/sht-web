@@ -15,7 +15,8 @@ import { formatCurrency } from './format'
  * ═══════════════════════════════════════════════════════════════════════════
  * MOCK CALCULATOR — FRONTEND ONLY (Phase 2).
  *
- * Phase 3+: fungsi ini digantikan panggilan ke Laravel Pricing Engine.
+ * Phase 3+/M7: fungsi ini digantikan panggilan ke SHT Pricing Engine
+ * (backend `sht-admin` — satu-satunya source of truth kalkulasi).
  * JANGAN tambahkan rumus harga di komponen UI — semua kalkulasi terpusat di sini.
  * Supplier cost & markup tidak pernah menjadi bagian dari kalkulasi customer.
  * ═══════════════════════════════════════════════════════════════════════════

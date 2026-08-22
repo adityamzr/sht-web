@@ -1,7 +1,7 @@
 import type { DepartureCityOption } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/departure-cities (Laravel).
+ * MOCK DATA — akan digantikan response GET /api/departure-cities (SHT REST API — sht-admin).
  * Business rule (locked): rute penerbangan internasional tetap CGK → JED.
  * Kota keberangkatan memengaruhi pricing (fee per pax).
  */

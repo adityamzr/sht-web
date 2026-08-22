@@ -1,7 +1,7 @@
 import type { VisaProduct } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/visa (Laravel).
+ * MOCK DATA — akan digantikan response GET /api/visa (SHT REST API — sht-admin).
  * Visa mandatory secara konsep; opsional sebagai biaya (customer bisa sudah punya).
  */
 export const mockVisa: VisaProduct = {

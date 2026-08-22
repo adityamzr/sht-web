@@ -1,7 +1,7 @@
 import type { Transportation, TransportRouteOption } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/transportations (Laravel).
+ * MOCK DATA — akan digantikan response GET /api/transportations (SHT REST API — sht-admin).
  * Transportation Planner penuh (route-based, guided) ada di Phase 2 estimator.
  */
 export const mockTransportations: Transportation[] = [

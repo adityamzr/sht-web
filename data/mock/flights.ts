@@ -1,7 +1,7 @@
 import type { Flight } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/flights (Laravel).
+ * MOCK DATA — akan digantikan response GET /api/flights (SHT REST API — sht-admin).
  * Rute MVP (locked): CGK → JED, opsi dikelola admin — bukan live GDS/OTA.
  * Harga = SELLING PRICE per orang.
  */

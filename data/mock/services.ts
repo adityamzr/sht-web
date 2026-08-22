@@ -1,7 +1,7 @@
 import type { Service } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/services (Laravel).
+ * MOCK DATA — akan digantikan response GET /api/services (SHT REST API — sht-admin).
  * pricingUnit mengikuti Master Context §7 (pax / room_night / vehicle_trip / group_session).
  */
 export const mockServices: Service[] = [
