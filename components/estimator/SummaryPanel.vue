@@ -23,7 +23,7 @@ defineProps<{
         <div v-for="cat in breakdown.categories" :key="cat.id" class="flex items-start justify-between gap-3 text-sm">
           <dt class="text-neutral-charcoal/70">{{ cat.label }}</dt>
           <dd class="shrink-0 font-semibold text-neutral-charcoal">
-            {{ cat.amount > 0 ? formatCurrency(cat.amount) : 'Termasuk' }}
+            {{ cat.lines.some((l) => l.unavailable) ? 'Harga dikonfirmasi' : cat.amount > 0 ? formatCurrency(cat.amount) : 'Termasuk' }}
           </dd>
         </div>
       </template>
@@ -35,12 +35,17 @@ defineProps<{
     <div class="mt-5 border-t border-neutral-line pt-5">
       <div class="flex items-center justify-between">
         <p class="text-sm font-semibold text-neutral-charcoal">Total Estimasi</p>
-        <p class="font-heading text-2xl font-semibold text-brand-green" aria-live="polite">
-          {{ breakdown.total > 0 ? formatCurrency(breakdown.total) : '—' }}
+        <p class="font-heading text-xl font-semibold" :class="breakdown.hasUnavailable ? 'text-gold' : 'text-2xl text-brand-green'" aria-live="polite">
+          <template v-if="breakdown.hasUnavailable">Perlu konfirmasi</template>
+          <template v-else-if="breakdown.total > 0">{{ formatCurrency(breakdown.total) }}</template>
+          <template v-else>—</template>
         </p>
       </div>
-      <p v-if="breakdown.total > 0" class="mt-1 text-right text-xs text-neutral-charcoal/60">
+      <p v-if="!breakdown.hasUnavailable && breakdown.total > 0" class="mt-1 text-right text-xs text-neutral-charcoal/60">
         ± {{ formatCurrency(breakdown.perPerson) }} /orang
+      </p>
+      <p v-if="breakdown.hasUnavailable" class="mt-1 text-right text-xs leading-relaxed text-neutral-charcoal/60">
+        Ada komponen yang harganya perlu konfirmasi tim kami.
       </p>
     </div>
   </aside>

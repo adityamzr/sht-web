@@ -3,7 +3,8 @@ import type { Currency } from '~/types'
 
 withDefaults(
   defineProps<{
-    amount: number
+    /** null = harga belum tersedia → tampilkan "Harga dikonfirmasi" (bukan Rp0/angka sumber). */
+    amount: number | null
     currency?: Currency
     prefix?: string
     suffix?: string
@@ -23,8 +24,9 @@ withDefaults(
       class="font-heading font-semibold"
       :class="[dark ? 'text-white' : 'text-brand-green', size === 'lg' ? 'text-2xl sm:text-3xl' : 'text-xl']"
     >
-      {{ formatCurrency(amount, currency) }}
-      <span v-if="suffix" class="font-sans text-xs font-normal" :class="dark ? 'text-white/60' : 'text-neutral-charcoal/60'">
+      <template v-if="amount !== null">{{ formatCurrency(amount, currency) }}</template>
+      <template v-else>Harga dikonfirmasi</template>
+      <span v-if="suffix && amount !== null" class="font-sans text-xs font-normal" :class="dark ? 'text-white/60' : 'text-neutral-charcoal/60'">
         {{ suffix }}
       </span>
     </p>

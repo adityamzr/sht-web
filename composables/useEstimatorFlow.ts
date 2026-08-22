@@ -107,7 +107,7 @@ export function useEstimatorFlow(getData: () => EstimatorDatasets) {
         id: 'visa',
         name: 'Visa Umroh',
         description: '',
-        pricePerPax: 0,
+        pricePerPax: null, // M3.1: tidak tersedia = null (bukan Rp0)
         currency: 'IDR',
       },
       services: data.value.services,

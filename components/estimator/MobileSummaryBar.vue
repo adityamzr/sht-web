@@ -17,8 +17,10 @@ const isOpen = ref(false)
     <div class="flex items-center justify-between gap-3 px-5 py-3.5">
       <div>
         <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-charcoal/50">Estimasi sementara</p>
-        <p class="font-heading text-xl font-semibold text-brand-green" aria-live="polite">
-          {{ breakdown.total > 0 ? formatCurrency(breakdown.total) : '—' }}
+        <p class="font-heading text-xl font-semibold" :class="breakdown.hasUnavailable ? 'text-gold' : 'text-brand-green'" aria-live="polite">
+          <template v-if="breakdown.hasUnavailable">Perlu konfirmasi</template>
+          <template v-else-if="breakdown.total > 0">{{ formatCurrency(breakdown.total) }}</template>
+          <template v-else>—</template>
         </p>
       </div>
       <AppButton variant="outline" size="sm" :aria-expanded="isOpen" @click="isOpen = true">

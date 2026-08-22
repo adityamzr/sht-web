@@ -61,7 +61,7 @@ const fallback = '/images/hotel-swissotel.jpg'
           <span class="mt-1 block text-xs text-brand-teal">{{ hotel.distance }}</span>
           <span class="mt-2 line-clamp-2 block text-xs leading-relaxed text-neutral-charcoal/70">{{ hotel.description }}</span>
           <span class="mt-3 block font-heading text-base font-semibold text-brand-green">
-            {{ formatCurrency(hotel.startingPrice) }}
+            {{ formatPrice(hotel.startingPrice) }}
             <span class="font-sans text-xs font-normal text-neutral-charcoal/60">/kamar/malam</span>
           </span>
         </span>

@@ -110,8 +110,8 @@ const iWaUrl = computed(() => {
                 <h3 class="mt-4 font-heading text-xl font-semibold text-neutral-charcoal">{{ service.name }}</h3>
                 <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">{{ service.description }}</p>
                 <p class="mt-3 text-sm">
-                  <span class="font-heading text-lg font-semibold text-brand-green">{{ formatCurrency(service.price, 'IDR') }}</span>
-                  <span class="text-xs text-neutral-charcoal/60">
+                  <span class="font-heading text-lg font-semibold text-brand-green">{{ formatPrice(service.price) }}</span>
+                  <span v-if="service.price !== null" class="text-xs text-neutral-charcoal/60">
                     {{ service.pricingUnit === 'group_session' ? '/sesi' : service.pricingUnit === 'package' ? '/paket' : '/orang' }}
                   </span>
                 </p>

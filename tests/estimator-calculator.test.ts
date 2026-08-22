@@ -35,7 +35,7 @@ const config: EstimatorConfiguration = {
   departureCity: 'Bandung', // fee 650k × 6 = 3.900.000
   departureDate: '2026-10-12',
   durationDays: 12,
-  returnDate: '2026-10-24',
+  returnDate: '2026-10-23', // M3.1: pulang = berangkat + (durasi - 1)
   makkahNights: 6,
   madinahNights: 5,
   flightId: 'FLT-002', // Garuda 17.5jt × 6 = 105.000.000

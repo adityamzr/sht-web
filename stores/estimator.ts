@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { computeReturnDate } from '~/utils/format'
 import type {
   DepartureCityId,
   EstimatorConfiguration,
@@ -16,7 +17,7 @@ const MIN_DURATION = 3
 const MAX_DURATION = 45
 
 function defaultState() {
-  const departureDate = addDaysISO(todayISO(), 45)
+  const departureDate = addDaysISO(todayISO(), 45) // default +45 hari dari hari ini (bukan return date)
   return {
     currentStep: 1 as number,
     pilgrims: 4 as number,
@@ -48,7 +49,7 @@ export const useEstimatorStore = defineStore('estimator', {
     /** Malam yang tersedia untuk dibagi (1 hari dipakai perjalanan). */
     maxNights: (s) => s.durationDays - 1,
 
-    returnDate: (s) => addDaysISO(s.departureDate, s.durationDays),
+    returnDate: (s) => computeReturnDate(s.departureDate, s.durationDays), // M3.1: inklusif
 
     /** Snapshot konfigurasi untuk kalkulator / future API payload. */
     configuration(s): EstimatorConfiguration {
@@ -57,7 +58,7 @@ export const useEstimatorStore = defineStore('estimator', {
         departureCity: s.departureCity,
         departureDate: s.departureDate,
         durationDays: s.durationDays,
-        returnDate: addDaysISO(s.departureDate, s.durationDays),
+        returnDate: computeReturnDate(s.departureDate, s.durationDays), // M3.1: inklusif
         makkahNights: s.makkahNights,
         madinahNights: s.madinahNights,
         flightId: s.flightId,
