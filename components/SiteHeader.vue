@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const isOpen = ref(false)
+const isServicesOpen = ref(false)
 const isScrolled = ref(false)
 const isHome = computed(() => route.path === '/')
 
@@ -13,32 +14,32 @@ onMounted(() => {
   window.addEventListener('scroll', updateScrollState, { passive: true })
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', updateScrollState)
-})
+onBeforeUnmount(() => window.removeEventListener('scroll', updateScrollState))
 
-const navItems = [
-  { label: 'Layanan', to: '/services' },
-  { label: 'Hotel', to: '/hotels' },
-  { label: 'Penerbangan', to: '/flights' },
-  { label: 'Transportasi', to: '/transportation' },
-  { label: 'Panduan', to: '/guides' },
+const navItems = [{ label: 'Panduan', to: '/guides' }]
+const serviceMenu = [
+  { label: 'Visa Umroh', to: '/services/visa', icon: 'visa' },
+  { label: 'Badal Umroh', to: '/services', icon: 'badal' },
+  { label: 'Hotel', to: '/hotels', icon: 'hotel' },
+  { label: 'Penerbangan', to: '/flights', icon: 'flight' },
+  { label: 'Transportasi', to: '/transportation', icon: 'transport' },
+  { label: 'Muthawwif', to: '/services', icon: 'guide' },
+  { label: 'Handling', to: '/services', icon: 'handling' },
 ]
-
 const waUrl = whatsappLink()
 
-// Tutup menu mobile setiap pindah halaman
 watch(
   () => route.fullPath,
   () => {
     isOpen.value = false
+    isServicesOpen.value = false
   },
 )
 </script>
 
 <template>
   <header
-    class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
+    class="relative z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
     :class="[
       isHome ? 'fixed left-1/2 top-4 -translate-x-1/2' : 'sticky top-4',
       isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/80',
@@ -46,86 +47,63 @@ watch(
   >
     <Container>
       <div class="flex h-14 items-center justify-between sm:h-16">
-        <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-2.5" aria-label="Sudut Haramain Tour — Beranda">
-          <img src="/assets/images/sht_horizontal_black_logo.png" alt="" class="h-12 w-full" />
-          <!-- <span class="leading-tight">
-            <span class="block font-heading text-base font-semibold text-sht-olive-dark sm:text-lg">Sudut Haramain</span>
-            <span class="block text-[10px] font-medium uppercase tracking-[0.24em] text-sht-gold">Tour</span>
-          </span> -->
+          <img src="/assets/images/sht_horizontal_black_logo.png" alt="" class="h-12 w-auto" />
         </NuxtLink>
 
-        <!-- Desktop nav -->
         <nav class="hidden items-center gap-7 lg:flex" aria-label="Navigasi utama">
-          <NuxtLink
-            v-for="item in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark"
-            :class="{ 'text-sht-olive-dark': route.path.startsWith(item.to) }"
-          >
-            {{ item.label }}
-          </NuxtLink>
+          <div class="relative">
+            <button type="button" class="inline-flex items-center gap-1.5 text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark" :aria-expanded="isServicesOpen" aria-controls="services-menu" @click="isServicesOpen = !isServicesOpen">
+              Layanan
+              <svg class="h-4 w-4 transition-transform duration-200" :class="isServicesOpen ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
+            </button>
+            <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="translate-y-1 opacity-0" enter-to-class="translate-y-0 opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
+              <div v-if="isServicesOpen" id="services-menu" class="absolute left-1/2 top-full mt-5 w-[520px] -translate-x-1/2 rounded-2xl border border-sht-stone bg-white p-4 shadow-xl shadow-sht-olive/10" role="menu" aria-label="Layanan Sudut Haramain">
+                <div class="grid grid-cols-2 gap-1">
+                  <NuxtLink v-for="item in serviceMenu" :key="item.label" :to="item.to" role="menuitem" class="group flex items-center gap-3 rounded-xl p-3 text-sm text-sht-charcoal/75 transition-colors hover:bg-sht-off-white hover:text-sht-olive-dark">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sht-gold/15 text-sht-olive" aria-hidden="true">
+                      <svg v-if="item.icon === 'visa'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h7l3 3V20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path stroke-linecap="round" d="M14 3.5V7h3M8.5 12h5"/></svg>
+                      <svg v-else-if="item.icon === 'badal'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M20 8.5c0 5-8 10-8 10s-8-5-8-10A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8 2.5Z"/></svg>
+                      <svg v-else-if="item.icon === 'hotel'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16m-12 0h16m-16 0v-4h4m8 0v-6h4"/></svg>
+                      <svg v-else-if="item.icon === 'flight'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 13.5-7.5-2.5 1.5-1.5L11 10l4.5-4.5a2.1 2.1 0 0 1 3 3L14 13l.5 6.5L13 21l-2.5-7.5Z"/></svg>
+                      <svg v-else-if="item.icon === 'transport'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M5 17h14M6.5 17l1.3-5.2A2 2 0 0 1 9.74 10.3h4.52a2 2 0 0 1 1.94 1.5L17.5 17m-10 0a2 2 0 1 0 4 0m2 0a2 2 0 1 0 4 0"/></svg>
+                      <svg v-else-if="item.icon === 'guide'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" d="M12 7v5l3.5 2"/></svg>
+                      <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l1 12H5L6 8Z"/><path stroke-linecap="round" d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                    </span>
+                    <span>{{ item.label }}</span>
+                  </NuxtLink>
+                </div>
+                <NuxtLink to="/services" role="menuitem" class="mt-3 block border-t border-sht-stone pt-3 text-center text-sm font-semibold text-sht-olive hover:text-sht-olive-dark">Lihat semua layanan →</NuxtLink>
+              </div>
+            </Transition>
+          </div>
+          <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to" class="text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark" :class="{ 'text-sht-olive-dark': route.path.startsWith(item.to) }">{{ item.label }}</NuxtLink>
         </nav>
 
         <div class="hidden items-center gap-3 lg:flex">
-          <AppButton :href="waUrl" variant="ghost" size="sm" external class="text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark"> WhatsApp </AppButton>
-          <AppButton to="/estimator" variant="gold" size="sm"> Hitung Estimasi </AppButton>
+          <AppButton :href="waUrl" variant="ghost" size="sm" external class="text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark">WhatsApp</AppButton>
+          <AppButton to="/estimator" variant="gold" size="sm">Hitung Estimasi</AppButton>
         </div>
 
-        <!-- Mobile hamburger -->
-        <button
-          type="button"
-          class="inline-flex h-11 w-11 items-center justify-center rounded-full text-sht-olive-dark hover:bg-sht-olive/5 lg:hidden"
-          :aria-expanded="isOpen"
-          aria-controls="mobile-menu"
-          aria-label="Buka menu navigasi"
-          @click="isOpen = !isOpen"
-        >
-          <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
-          </svg>
+        <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-full text-sht-olive-dark hover:bg-sht-olive/5 lg:hidden" :aria-expanded="isOpen" aria-controls="mobile-menu" aria-label="Buka menu navigasi" @click="isOpen = !isOpen">
+          <svg v-if="!isOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
+          <svg v-else class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
       </div>
     </Container>
 
-    <!-- Mobile menu: soft height/opacity transition, tanpa scroll-jacking -->
-    <Transition
-      enter-active-class="transition-[max-height,opacity] duration-300 ease-out"
-      enter-from-class="max-h-0 opacity-0"
-      enter-to-class="max-h-96 opacity-100"
-      leave-active-class="transition-[max-height,opacity] duration-250 ease-in"
-      leave-from-class="max-h-96 opacity-100"
-      leave-to-class="max-h-0 opacity-0"
-    >
-      <div v-show="isOpen" id="mobile-menu" class="max-h-96 border-t border-sht-olive/10 bg-white/95 lg:hidden">
-      <Container>
-        <nav class="flex flex-col gap-1 py-4" aria-label="Navigasi seluler">
-          <NuxtLink
-            v-for="item in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="rounded-xl px-4 py-3 text-base font-medium text-sht-charcoal/80 hover:bg-sht-olive/5 hover:text-sht-olive-dark"
-          >
-            {{ item.label }}
-          </NuxtLink>
-          <div class="mt-3 flex flex-col gap-2 px-1 pb-2">
-            <AppButton to="/estimator" variant="gold" block> Hitung Estimasi Umroh </AppButton>
-            <AppButton
-              :href="waUrl"
-              variant="ghost"
-              block
-              external
-              class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark"
-            >
-              Konsultasi via WhatsApp
-            </AppButton>
-          </div>
-        </nav>
-      </Container>
+    <Transition enter-active-class="transition-[max-height,opacity] duration-300 ease-out" enter-from-class="max-h-0 opacity-0" enter-to-class="max-h-[600px] opacity-100" leave-active-class="transition-[max-height,opacity] duration-250 ease-in" leave-from-class="max-h-[600px] opacity-100" leave-to-class="max-h-0 opacity-0">
+      <div v-show="isOpen" id="mobile-menu" class="max-h-[600px] border-t border-sht-olive/10 bg-white/95 lg:hidden">
+        <Container>
+          <nav class="py-4" aria-label="Navigasi seluler">
+            <p class="px-4 pb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Layanan</p>
+            <div class="grid grid-cols-2 gap-1">
+              <NuxtLink v-for="item in serviceMenu" :key="item.label" :to="item.to" class="rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">{{ item.label }}</NuxtLink>
+            </div>
+            <NuxtLink to="/guides" class="mt-2 block rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">Panduan</NuxtLink>
+            <div class="mt-3 flex flex-col gap-2 px-1 pb-2"><AppButton to="/estimator" variant="gold" block>Hitung Estimasi Umroh</AppButton><AppButton :href="waUrl" variant="ghost" block external class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark">Konsultasi via WhatsApp</AppButton></div>
+          </nav>
+        </Container>
       </div>
     </Transition>
   </header>
