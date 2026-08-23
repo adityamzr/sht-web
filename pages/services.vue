@@ -3,11 +3,10 @@ import type { Service, ServiceInquiryResult } from '~/types'
 import { buildServiceInquiryMessage } from '~/utils/waMessage'
 
 useSeoMeta({
-  title: 'Layanan — Sudut Haramain Tour',
-  description:
-    'Visa umroh, penerbangan, hotel, transportasi, muthowwif, dan layanan tambahan — satu pintu untuk perjalanan Umroh private Anda.',
-  ogTitle: 'Layanan — Sudut Haramain Tour',
-  ogDescription: 'Semua kebutuhan Umroh private dalam satu tempat.',
+  title: 'Layanan Umroh Mandiri — Sudut Haramain',
+  description: 'Pilih layanan Umroh sesuai kebutuhan Anda, mulai dari visa, pendampingan, hingga kebutuhan perjalanan lainnya bersama Sudut Haramain.',
+  ogTitle: 'Layanan Umroh Mandiri — Sudut Haramain',
+  ogDescription: 'Pilih bantuan Umroh sesuai rencana dan kebutuhan perjalanan Anda.',
 })
 
 const { services, pending, error, refresh } = useServices()
@@ -16,25 +15,66 @@ const config = useRuntimeConfig()
 const { whatsappNumber } = useSiteConfig()
 const waUrl = whatsappLink()
 
-// ─── Service Inquiry (Service Buyer — tanpa Trip Builder) ──────────────────
+type DirectoryItem = {
+  id: string
+  name: string
+  description: string
+  icon: 'visa' | 'badal' | 'hotel' | 'flight' | 'transport' | 'guide' | 'handling' | 'kit'
+  to?: string
+  service?: Service
+}
+
+const directoryItems = computed<DirectoryItem[]>(() => {
+  const byCode = (code: string) => services.value.find((service) => service.code?.toLowerCase() === code)
+  const visa = byCode('visa') ?? services.value.find((service) => service.name.toLowerCase().includes('visa'))
+  const muthawwif = services.value.find((service) => `${service.code ?? ''} ${service.name}`.toLowerCase().includes('muth'))
+  const handling = services.value.find((service) => `${service.code ?? ''} ${service.name}`.toLowerCase().includes('handling'))
+  const known = new Set([visa?.id, muthawwif?.id, handling?.id])
+  const otherServices = services.value.filter((service) => !known.has(service.id))
+
+  return [
+    visa && { id: visa.id, name: visa.name, description: visa.description, icon: 'visa' as const, to: '/services/visa', service: visa },
+    { id: 'badal-umroh', name: 'Badal Umroh', description: 'Bantuan pengurusan Badal Umroh sesuai kebutuhan keluarga Anda.', icon: 'badal' as const },
+    { id: 'hotel', name: 'Hotel', description: 'Cari akomodasi di Makkah dan Madinah.', icon: 'hotel' as const, to: '/hotels' },
+    { id: 'flight', name: 'Penerbangan', description: 'Lihat pilihan perjalanan udara yang tersedia.', icon: 'flight' as const, to: '/flights' },
+    { id: 'transport', name: 'Transportasi', description: 'Atur transfer dan perjalanan selama di Saudi.', icon: 'transport' as const, to: '/transportation' },
+    muthawwif && { id: muthawwif.id, name: muthawwif.name, description: muthawwif.description, icon: 'guide' as const, service: muthawwif },
+    handling && { id: handling.id, name: handling.name, description: handling.description, icon: 'handling' as const, service: handling },
+    ...otherServices.map((service) => ({ id: service.id, name: service.name, description: service.description, icon: 'kit' as const, service })),
+  ].filter(Boolean) as DirectoryItem[]
+})
+
+function pricingUnitLabel(service: Service) {
+  if (service.pricingUnit === 'group_session') return 'per sesi'
+  if (service.pricingUnit === 'package') return 'per paket'
+  return 'per jamaah'
+}
+
 const inquiryService = ref<Service | null>(null)
+const inquiryTitle = ref('')
 const iForm = reactive({ name: '', whatsapp: '', email: '', notes: '' })
 const iError = ref<string | null>(null)
 const iPending = ref(false)
 const iDone = ref<ServiceInquiryResult | null>(null)
 
-function openInquiry(service: Service) {
+function openInquiry(service: Service, title = service.name) {
   inquiryService.value = service
+  inquiryTitle.value = title
   iDone.value = null
   iError.value = null
   Object.assign(iForm, { name: '', whatsapp: '', email: '', notes: '' })
 }
+
+function openBadalInquiry() {
+  openInquiry({ id: 'badal-umroh', code: 'badal', name: 'Badal Umroh', description: '', price: null, pricingUnit: 'pax', image: '', status: 'active' }, 'Badal Umroh')
+}
+
 function closeInquiry() {
   inquiryService.value = null
+  inquiryTitle.value = ''
   iDone.value = null
 }
 
-// Deep-link dari halaman layanan khusus, tanpa membuat ulang alur inquiry.
 watch(
   [services, () => route.query.service],
   ([availableServices, serviceCode]) => {
@@ -59,15 +99,10 @@ async function submitInquiry() {
   }
   iPending.value = true
   try {
+    const serviceId = inquiryService.value && /^\d+$/.test(inquiryService.value.id) ? Number(inquiryService.value.id) : null
     const res = await $fetch<{ data: ServiceInquiryResult }>(`${config.public.apiBaseUrl}/api/v1/leads`, {
       method: 'POST',
-      body: {
-        serviceId: inquiryService.value ? Number(inquiryService.value.id) : null,
-        name,
-        whatsapp,
-        email: iForm.email.trim() || null,
-        notes: iForm.notes.trim() || null,
-      },
+      body: { serviceId, name, whatsapp, email: iForm.email.trim() || null, notes: iForm.notes.trim() || null },
     })
     iDone.value = res.data
   } catch (err: unknown) {
@@ -78,125 +113,59 @@ async function submitInquiry() {
   }
 }
 
-const iWaUrl = computed(() => {
-  const message = buildServiceInquiryMessage(iForm.name.trim(), inquiryService.value)
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
-})
+const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildServiceInquiryMessage(iForm.name.trim(), inquiryService.value))}`)
 </script>
 
 <template>
-  <div>
-    <section class="bg-sky-gradient py-12 sm:py-16">
+  <div class="bg-sht-off-white">
+    <section class="border-b border-sht-stone/70 py-14 sm:py-20">
       <Container>
-        <SectionHeader
-          eyebrow="Layanan"
-          title="Semua kebutuhan Umroh Anda, dalam satu tempat"
-          subtitle="Dari visa hingga pendamping ibadah — pilih yang Anda butuhkan, kami rangkai menjadi satu perjalanan yang tenang."
-        />
+        <div class="max-w-3xl mx-auto text-center">
+          <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold"><span class="h-px w-8 bg-sht-gold" aria-hidden="true" />LAYANAN SUDUT HARAMAIN<span class="h-px w-8 bg-sht-gold" aria-hidden="true" /></p>
+          <h1 class="mx-auto mt-4 max-w-2xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark sm:text-5xl">Pilih Bantuan yang Anda Perlukan.</h1>
+          <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75 sm:text-lg">Temukan kebutuhan perjalanan dan pendampingan Umroh dalam satu tempat, lalu pilih layanan yang sesuai dengan rencana Anda.</p>
+        </div>
+        <div v-if="pending" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><div v-for="n in 6" :key="n" class="h-56 animate-pulse rounded-2xl bg-sht-stone/60" aria-hidden="true" /></div>
+        <div v-else-if="error" class="mt-10 rounded-2xl border border-sht-stone bg-white p-8 text-center"><p class="text-sm text-sht-charcoal/70">Kami kesulitan memuat layanan. Silakan coba lagi.</p><AppButton variant="gold" class="mt-4" @click="refresh">Coba Lagi</AppButton></div>
+        <div v-else class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <article v-for="item in directoryItems" :key="item.id" class="flex flex-col rounded-2xl border border-sht-stone bg-white p-5 shadow-[0_8px_24px_-20px_rgba(45,53,31,0.45)]">
+            <div class="flex items-start justify-between gap-4"><div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sht-gold/15 text-sht-olive" aria-hidden="true">
+              <svg v-if="item.icon === 'visa'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h7l3 3V20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path stroke-linecap="round" d="M14 3.5V7h3M8.5 12h5M8.5 15h3"/></svg>
+              <svg v-else-if="item.icon === 'badal'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M20 8.5c0 5-8 10-8 10s-8-5-8-10A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8 2.5Z"/><path stroke-linecap="round" d="M12 9v4M10 11h4"/></svg>
+              <svg v-else-if="item.icon === 'hotel'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16m-12 0h16m-16 0v-4h4m8 0v-6h4a2 2 0 0 1 2 2v8M8.5 7h1m3 0h1m-5 4h1m3 0h1"/></svg>
+              <svg v-else-if="item.icon === 'flight'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 13.5-7.5-2.5 1.5-1.5L11 10l4.5-4.5a2.1 2.1 0 0 1 3 3L14 13l.5 6.5L13 21l-2.5-7.5Z"/></svg>
+              <svg v-else-if="item.icon === 'transport'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M5 17h14M6.5 17l1.3-5.2A2 2 0 0 1 9.74 10.3h4.52a2 2 0 0 1 1.94 1.5L17.5 17m-10 0a2 2 0 1 0 4 0m2 0a2 2 0 1 0 4 0M7 13.5h10"/></svg>
+              <svg v-else-if="item.icon === 'guide'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" d="M12 7v5l3.5 2M4.5 12H2.8M21.2 12h-1.7"/></svg>
+              <svg v-else-if="item.icon === 'handling'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l1 12H5L6 8Z"/><path stroke-linecap="round" d="M9 8V6a3 3 0 0 1 6 0v2M8 13h8M12 10v6"/></svg>
+              <svg v-else class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="m7 7 5-3 5 3v7l-5 3-5-3V7Z"/><path stroke-linecap="round" d="m7 7 5 3 5-3M12 10v7M5 18.5l7 3 7-3"/></svg>
+            </div></div>
+            <h3 class="mt-4 font-heading text-lg font-semibold text-sht-olive-dark">{{ item.name }}</h3>
+            <p class="mt-1.5 line-clamp-3 flex-1 text-sm leading-relaxed text-sht-charcoal/70">{{ item.description }}</p>
+            <div class="mt-4 flex items-center justify-between gap-3 border-t border-sht-stone/80 pt-3">
+              <div v-if="item.service?.price !== null && item.service" class="min-w-0 flex items-baseline gap-1.5"><span class="font-heading text-base font-semibold text-sht-olive-dark">{{ formatPrice(item.service.price) }}</span><span class="truncate text-xs text-sht-charcoal/55">{{ pricingUnitLabel(item.service) }}</span></div>
+              <span v-else-if="item.service" class="text-xs font-semibold text-sht-olive-dark">Harga dikonfirmasi</span>
+              <span v-else class="text-xs text-sht-charcoal/45">Lihat detail</span>
+              <NuxtLink v-if="item.to" :to="item.to" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold">{{ item.to === '/hotels' ? 'Lihat Hotel' : item.to === '/flights' ? 'Lihat Penerbangan' : item.to === '/transportation' ? 'Lihat Transportasi' : 'Selengkapnya' }} <span aria-hidden="true">→</span></NuxtLink>
+              <button v-else type="button" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold" @click="item.id === 'badal-umroh' ? openBadalInquiry() : item.service && openInquiry(item.service)">Konsultasikan <span aria-hidden="true">→</span></button>
+            </div>
+          </article>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between rounded-3xl bg-sht-olive px-6 py-8 text-center mt-12 sm:mt-16 sm:mb-24">
+          <div class="text-center sm:text-start">
+            <span class="mt-3 max-w-2xl font-heading text-lg font-semibold text-sht-off-white sm:text-2xl">Belum Menemukan yang Anda Butuhkan?</span>
+            <p class="mt-3 max-w-2xl text-xs leading-relaxed text-sht-off-white/75">Ceritakan kebutuhan perjalanan Anda, tim kami akan membantu mengecek opsi yang tersedia.</p>
+          </div>
+          <div class="flex items-center justify-center">
+            <AppButton :href="waUrl" variant="gold" size="lg" external class="mt-7 sm:mt-0">Konsultasikan Kebutuhan</AppButton>
+          </div>
+        </div>
       </Container>
     </section>
 
-    <section class="py-12 sm:py-16">
-      <Container>
-        <!-- Loading -->
-        <div v-if="pending" class="grid gap-5 sm:grid-cols-2">
-          <div v-for="n in 4" :key="n" class="h-40 animate-pulse rounded-card bg-neutral-warm" aria-hidden="true" />
-        </div>
-
-        <!-- Error -->
-        <div v-else-if="error" class="rounded-card border border-gold-soft bg-gold-sand/50 p-8 text-center">
-          <p class="font-heading text-lg font-semibold">Koneksi terganggu</p>
-          <p class="mt-2 text-sm text-neutral-charcoal/70">Kami kesulitan memuat daftar layanan. Silakan coba lagi.</p>
-          <AppButton variant="primary" class="mt-4" @click="refresh"> Coba Lagi </AppButton>
-        </div>
-
-        <template v-else>
-          <div class="grid gap-5 sm:grid-cols-2">
-            <div v-for="service in services" :key="service.id" class="flex flex-col gap-3 rounded-card border border-neutral-line bg-white p-6 shadow-card">
-              <div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-card bg-brand-sky/50 text-brand-green">
-                  <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M9 8h6M6 3.5h12A1.5 1.5 0 0 1 19.5 5v14a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19V5A1.5 1.5 0 0 1 6 3.5Z" />
-                  </svg>
-                </div>
-                <h3 class="mt-4 font-heading text-xl font-semibold text-neutral-charcoal">{{ service.name }}</h3>
-                <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">{{ service.description }}</p>
-                <p class="mt-3 text-sm">
-                  <span class="font-heading text-lg font-semibold text-brand-green">{{ formatPrice(service.price) }}</span>
-                  <span v-if="service.price !== null" class="text-xs text-neutral-charcoal/60">
-                    {{ service.pricingUnit === 'group_session' ? '/sesi' : service.pricingUnit === 'package' ? '/paket' : '/orang' }}
-                  </span>
-                </p>
-              </div>
-              <button
-                type="button"
-                class="mt-auto min-h-[40px] rounded-full border border-brand-green/30 px-4 py-2 text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green/5"
-                @click="openInquiry(service)"
-              >
-                Konsultasikan Layanan Ini
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-12 rounded-card border border-gold-soft bg-gold-sand/50 p-6 sm:p-8">
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 class="font-heading text-xl font-semibold">Butuh layanan yang tidak ada di daftar?</h3>
-                <p class="mt-1.5 text-sm text-neutral-charcoal/70">
-                  Ceritakan kebutuhan Anda — hampir semua kebutuhan perjalanan Umroh bisa kami bantu.
-                </p>
-              </div>
-              <AppButton :href="waUrl" variant="primary" external class="shrink-0"> Tanya via WhatsApp </AppButton>
-            </div>
-          </div>
-        </template>
-      </Container>
-    </section>
-
-    <!-- Modal inquiry layanan -->
-    <div v-if="inquiryService" class="fixed inset-0 z-50 flex items-end justify-center bg-neutral-charcoal/50 p-4 sm:items-center" role="dialog" aria-modal="true" :aria-label="`Konsultasi ${inquiryService.name}`">
-      <div class="w-full max-w-md rounded-card bg-white p-6 shadow-card-hover sm:p-8">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <h3 class="font-heading text-lg font-semibold">Konsultasi {{ inquiryService.name }}</h3>
-            <p class="mt-1 text-sm text-neutral-charcoal/60">Tim kami akan menghubungi Anda — gratis, tanpa komitmen.</p>
-          </div>
-          <button type="button" class="rounded-full p-2 text-neutral-charcoal/50 hover:bg-neutral-warm" aria-label="Tutup" @click="closeInquiry">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
-          </button>
-        </div>
-
-        <div v-if="iDone" class="mt-6 text-center">
-          <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
-            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg>
-          </span>
-          <p class="mt-3 font-heading text-lg font-semibold">Permintaan terkirim!</p>
-          <p class="mt-2 text-sm text-neutral-charcoal/70">Konsultan kami akan menghubungi Anda. Untuk lebih cepat, lanjutkan via WhatsApp.</p>
-          <AppButton :href="iWaUrl" variant="whatsapp" block external class="mt-5"> Lanjut via WhatsApp </AppButton>
-          <button type="button" class="mt-3 min-h-[40px] w-full rounded-full px-4 text-sm font-semibold text-neutral-charcoal/60 hover:text-brand-green" @click="closeInquiry">Tutup</button>
-        </div>
-
-        <form v-else class="mt-5 space-y-4" @submit.prevent="submitInquiry">
-          <label class="block text-sm font-semibold">Nama Anda *
-            <input v-model="iForm.name" type="text" autocomplete="name" class="mt-1.5 min-h-[44px] w-full rounded-card border border-neutral-line px-4 py-2.5 text-sm font-normal focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20" placeholder="cth: Siti Maryam" />
-          </label>
-          <label class="block text-sm font-semibold">Nomor WhatsApp *
-            <input v-model="iForm.whatsapp" type="tel" inputmode="numeric" autocomplete="tel" class="mt-1.5 min-h-[44px] w-full rounded-card border border-neutral-line px-4 py-2.5 text-sm font-normal focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20" placeholder="cth: 6281234567890" />
-          </label>
-          <label class="block text-sm font-semibold">Email (opsional)
-            <input v-model="iForm.email" type="email" autocomplete="email" class="mt-1.5 min-h-[44px] w-full rounded-card border border-neutral-line px-4 py-2.5 text-sm font-normal focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20" placeholder="cth: nama@email.com" />
-          </label>
-          <label class="block text-sm font-semibold">Catatan (opsional)
-            <input v-model="iForm.notes" type="text" class="mt-1.5 min-h-[44px] w-full rounded-card border border-neutral-line px-4 py-2.5 text-sm font-normal focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20" placeholder="cth: keluarga 4 orang, akhir Oktober" />
-          </label>
-          <p v-if="iError" class="rounded-card border border-gold-soft bg-gold-sand/50 px-4 py-2.5 text-sm" role="alert">{{ iError }}</p>
-          <AppButton variant="primary" block type="submit" :disabled="iPending">
-            {{ iPending ? 'Mengirim…' : 'Kirim Permintaan' }}
-          </AppButton>
-        </form>
-      </div>
-    </div>
-
-    <CtaSection class="pb-14 sm:pb-20" />
+    <div v-if="inquiryService" class="fixed inset-0 z-50 flex items-end justify-center bg-sht-olive-dark/55 p-4 sm:items-center" role="dialog" aria-modal="true" :aria-label="`Konsultasi ${inquiryTitle}`"><div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-sht-stone bg-sht-off-white p-6 shadow-2xl sm:p-8"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-sage">KONSULTASI LAYANAN</p><h3 class="mt-2 font-heading text-xl font-semibold text-sht-olive-dark">{{ inquiryTitle }}</h3><p class="mt-1 text-sm text-sht-charcoal/60">Tim kami akan menghubungi Anda — gratis, tanpa komitmen.</p></div><button type="button" class="rounded-full p-2 text-sht-charcoal/50 hover:bg-sht-stone/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sht-gold" aria-label="Tutup" @click="closeInquiry"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div v-if="iDone" class="mt-6 text-center"><span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sht-gold/20 text-sht-olive"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg></span><p class="mt-3 font-heading text-lg font-semibold text-sht-olive-dark">Permintaan terkirim!</p><p class="mt-2 text-sm text-sht-charcoal/70">Konsultan kami akan menghubungi Anda. Untuk lebih cepat, lanjutkan via WhatsApp.</p><AppButton :href="iWaUrl" variant="gold" block external class="mt-5">Lanjut via WhatsApp</AppButton><button type="button" class="mt-3 min-h-[40px] w-full rounded-full px-4 text-sm font-semibold text-sht-charcoal/60 hover:text-sht-olive" @click="closeInquiry">Tutup</button></div>
+      <form v-else class="mt-5 space-y-4" @submit.prevent="submitInquiry"><label class="block text-sm font-semibold text-sht-charcoal">Nama Anda *<input v-model="iForm.name" type="text" autocomplete="name" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: Siti Maryam" /></label><label class="block text-sm font-semibold text-sht-charcoal">Nomor WhatsApp *<input v-model="iForm.whatsapp" type="tel" inputmode="numeric" autocomplete="tel" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: 6281234567890" /></label><label class="block text-sm font-semibold text-sht-charcoal">Email (opsional)<input v-model="iForm.email" type="email" autocomplete="email" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: nama@email.com" /></label><label class="block text-sm font-semibold text-sht-charcoal">Catatan (opsional)<input v-model="iForm.notes" type="text" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: keluarga 4 orang, akhir Oktober" /></label><p v-if="iError" class="rounded-xl border border-sht-gold/60 bg-sht-gold/10 px-4 py-2.5 text-sm" role="alert">{{ iError }}</p><AppButton variant="gold" block type="submit" :disabled="iPending">{{ iPending ? 'Mengirim…' : 'Kirim Permintaan' }}</AppButton></form>
+    </div></div>
   </div>
 </template>

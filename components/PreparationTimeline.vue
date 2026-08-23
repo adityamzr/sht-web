@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
       <!-- Desktop: anchored context + page-scrolling timeline -->
       <div class="hidden md:grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-start md:gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
         <div class="md:sticky md:top-24">
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
             <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
             PERSIAPAN UMROH MANDIRI
           </p>
@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
                   <svg v-else-if="step.icon === 'guide'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="M4.5 5.5A2.5 2.5 0 0 1 7 3h4.5v16H7a2.5 2.5 0 0 0-2.5 2.5v-16Z"/><path stroke-linejoin="round" d="M19.5 5.5A2.5 2.5 0 0 0 17 3h-4.5v16H17a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
                   <svg v-else class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="m7 7 5-3 5 3v7l-5 3-5-3V7Z"/><path stroke-linecap="round" d="m7 7 5 3 5-3M12 10v7M5 18.5l7 3 7-3"/></svg>
                 </span>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Tahap {{ step.number }}</p>
+                <!-- <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Langkah {{ step.number }}</p> -->
                 <h3 class="mt-2 font-heading text-xl font-semibold leading-snug text-sht-olive-dark lg:text-2xl">{{ step.title }}</h3>
                 <p class="mt-3 max-w-xl text-sm leading-relaxed text-sht-charcoal/70 lg:text-base">{{ step.description }}</p>
                 <NuxtLink
@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
       <!-- Mobile: single-column page-scrolling storytelling -->
       <div class="md:hidden">
         <div>
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
             <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
             PERSIAPAN UMROH MANDIRI
           </p>
@@ -239,7 +239,7 @@ onBeforeUnmount(() => {
                   <svg v-else-if="step.icon === 'guide'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="M4.5 5.5A2.5 2.5 0 0 1 7 3h4.5v16H7a2.5 2.5 0 0 0-2.5 2.5v-16Z"/><path stroke-linejoin="round" d="M19.5 5.5A2.5 2.5 0 0 0 17 3h-4.5v16H17a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
                   <svg v-else class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="m7 7 5-3 5 3v7l-5 3-5-3V7Z"/><path stroke-linecap="round" d="m7 7 5 3 5-3M12 10v7M5 18.5l7 3 7-3"/></svg>
                 </span>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Tahap {{ step.number }}</p>
+                <!-- <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Langkah {{ step.number }}</p> -->
                 <h3 class="mt-2 font-heading text-xl font-semibold leading-snug text-sht-olive-dark">{{ step.title }}</h3>
                 <p class="mt-3 text-sm leading-relaxed text-sht-charcoal/70">{{ step.description }}</p>
                 <NuxtLink
@@ -259,7 +259,7 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Existing closing callout preserved -->
-      <div class="mt-16 border-t border-sht-stone pt-12 text-center">
+      <!-- <div class="mt-16 border-t border-sht-stone pt-12 text-center">
         <h3 class="font-heading text-2xl font-semibold text-sht-olive-dark text-balance sm:text-3xl">
           {{ closing.heading }}
         </h3>
@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
             {{ closing.cta }}
           </NuxtLink>
         </div>
-      </div>
+      </div> -->
     </Container>
   </section>
 </template>

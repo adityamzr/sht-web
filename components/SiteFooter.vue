@@ -24,28 +24,24 @@ const navGroups = [
 </script>
 
 <template>
-  <footer class="bg-kabah-gradient text-white">
+  <footer class="bg-sht-olive-dark text-white">
     <Container>
       <div class="grid gap-10 py-14 sm:py-16 md:grid-cols-2 lg:grid-cols-4">
         <!-- Brand -->
         <div class="md:col-span-2 lg:col-span-2">
           <div class="flex items-center gap-2.5">
-            <img src="/favicon.svg" alt="" class="h-10 w-10" />
-            <span class="leading-tight">
-              <span class="block font-heading text-lg font-semibold">Sudut Haramain</span>
-              <span class="block text-[10px] font-medium uppercase tracking-[0.24em] text-gold-soft">Tour</span>
-            </span>
+            <img src="/assets/images/sht_horizontal_white_logo.png" alt="" class="h-[80px] sm:h-[96px] w-auto" />
           </div>
           <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
-            {{ site.tagline }} Kami membantu menyiapkan visa, penerbangan, hotel, dan transportasi —
-            Anda fokus pada kekhusyukan ibadah.
+            Sudut Haramain membantu Anda menyiapkan Umroh Mandiri dengan lebih terarah melalui layanan fleksibel,
+            estimasi perjalanan, dan panduan yang dibutuhkan.
           </p>
           <p class="mt-6 text-xs text-white/50">{{ site.address }}</p>
         </div>
 
         <!-- Nav -->
         <div v-for="group in navGroups" :key="group.title">
-          <h3 class="text-sm font-semibold uppercase tracking-wider text-gold-soft">{{ group.title }}</h3>
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-sht-gold">{{ group.title }}</h3>
           <ul class="mt-4 space-y-2.5">
             <li v-for="link in group.links" :key="link.label">
               <NuxtLink v-if="link.to" :to="link.to" class="text-sm text-white/70 transition-colors hover:text-white">

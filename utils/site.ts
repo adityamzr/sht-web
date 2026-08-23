@@ -11,12 +11,12 @@ export function useSiteConfig() {
   const whatsappNumber = config.public.whatsappNumber as string
 
   return {
-    brandName: 'Sudut Haramain Tour',
+    brandName: 'Sudut Haramain',
     brandShort: 'SHT',
-    tagline: 'Umroh Private, Sesuai Cara Anda.',
+    tagline: 'Jalani Umroh Mandiri,Tanpa Harus Repot Sendiri.',
     whatsappNumber,
     siteUrl: config.public.siteUrl as string,
-    email: 'halo@sudutharamain.id', // placeholder
+    email: 'sudutharamain.id@gmail.com', // placeholder
     address: 'Jakarta, Indonesia', // placeholder
   }
 }
@@ -26,6 +26,6 @@ export function whatsappLink(message?: string): string {
   const { whatsappNumber } = useSiteConfig()
   const text =
     message ??
-    'Assalamu’alaikum, saya ingin konsultasi rencana Umroh Private bersama Sudut Haramain Tour.'
+    'Assalamu’alaikum, saya ingin konsultasi rencana Umroh Private bersama Sudut Haramain.'
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`
 }
