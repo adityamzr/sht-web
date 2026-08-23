@@ -4,13 +4,8 @@
  * Narasi homepage: Hero ("tidak harus repot sendiri") → bagian ini
  * ("apa yang perlu saya persiapkan?"). BUKAN katalog layanan, BUKAN grid kartu.
  *
- * COPY M4A.2.1 = finalized — teks timeline berada di array `steps`
- * agar dapat direvisi Product Owner tanpa mengubah struktur visual.
- *
- * Animasi = progressive enhancement (IntersectionObserver + CSS, tanpa library):
- * - mobile: rail gold mengisi mengikuti scroll; node aktif saat step masuk viewport.
- * - desktop: reveal sekuensial sekali saat section pertama terlihat.
- * - prefers-reduced-motion: semua animasi mati, konten selalu terlihat penuh.
+ * Copy M4A.2.1 telah dikunci. Layout M4A.2.2 memakai progressive enhancement:
+ * split sticky storytelling di desktop dan vertical storytelling di mobile.
  * Konten terlihat BY DEFAULT — bila JS gagal, tidak ada yang tersembunyi.
  */
 
@@ -59,192 +54,181 @@ const closing = {
   ctaTo: '/estimator',
 }
 
-// ─── Scroll/reveal state (mobile-first, halus) ───────────────────────────────
 const sectionRef = ref<HTMLElement | null>(null)
-const stepRefs = ref<(HTMLElement | null)[]>([])
-const revealed = ref(false) // desktop: section sudah terlihat (sekali)
-const activeStep = ref(0) // jumlah step yang sudah "dilewati" (node → gold)
-const progressPct = ref(0) // isi rail gold mobile (0–100)
-const railPx = ref(0) // tinggi rail gold dalam pixel (deterministik)
+const desktopStepRefs = ref<(HTMLElement | null)[]>([])
+const mobileStepRefs = ref<(HTMLElement | null)[]>([])
+const activeStep = ref(0)
 const reducedMotion = ref(false)
-const ready = ref(false) // JS aktif — hanya setelah ini transisi "pre-reveal" berlaku
+const ready = ref(false)
 
-let revealObserver: IntersectionObserver | null = null
-let onScrollCleanup: (() => void) | null = null
+let stepObserver: IntersectionObserver | null = null
 
-function setStepRef(el: unknown, index: number) {
-  if (el instanceof HTMLElement) stepRefs.value[index] = el
+function setStepRef(target: 'desktop' | 'mobile', el: unknown, index: number) {
+  if (!(el instanceof HTMLElement)) return
+  if (target === 'desktop') desktopStepRefs.value[index] = el
+  else mobileStepRefs.value[index] = el
 }
+
+const progressHeight = computed(() => `${(activeStep.value / (steps.length - 1)) * 100}%`)
 
 onMounted(() => {
   reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   ready.value = true
 
-  if (reducedMotion.value) {
-    // Tanpa animasi: semua terlihat penuh, tidak ada observer/scroll listener.
-    revealed.value = true
-    activeStep.value = steps.length
-    return
-  }
+  if (reducedMotion.value) return
 
-  // 1) Reveal desktop: sekali saat section masuk viewport.
-  revealObserver = new IntersectionObserver(
+  // The observer follows normal page scroll. The focal band sits below the
+  // header, so one step becomes prominent without trapping the page in a
+  // nested scroller or requiring scroll-jacking.
+  stepObserver = new IntersectionObserver(
     (entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        revealed.value = true
-        revealObserver?.disconnect()
-      }
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top))
+      const current = visible[0]?.target.getAttribute('data-step-index')
+      if (current !== null && current !== undefined) activeStep.value = Number(current)
     },
-    { threshold: 0.15 },
+    { rootMargin: '-28% 0px -48% 0px', threshold: [0, 0.2, 0.6, 1] },
   )
-  if (sectionRef.value) revealObserver.observe(sectionRef.value)
 
-  // 2) Rail gold + aktivasi node (mobile): geometri deterministik — jumlah step
-  //    yang top-nya sudah melewati garis aktivasi. Robust untuk lompatan scroll
-  //    besar (fling/anchor) sekalipun.
-  const activationLine = () => window.innerHeight * 0.62
-  let ticking = false
-  const trackEl = () => sectionRef.value?.querySelector<HTMLElement>('.md\\:hidden ol')
-  const updateProgress = () => {
-    ticking = false
-    const el = sectionRef.value
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const line = activationLine()
-    const total = rect.height - line
-    const pct = total <= 0 ? 100 : Math.min(100, Math.max(0, ((line - rect.top) / total) * 100))
-    progressPct.value = pct
-    const track = trackEl()
-    if (track) railPx.value = Math.round(((track.clientHeight - 24) * pct) / 100)
-
-    // Aktivasi: hitung step yang top-nya sudah melewati garis aktivasi.
-    // Elemen display:none (timeline desktop) dilewati — aktivasi khusus mobile;
-    // desktop sengaja statis (hanya reveal sekali + garis isi).
-    let passed = 0
-    for (const li of stepRefs.value) {
-      if (li && li.offsetParent !== null && li.getBoundingClientRect().top < line) passed += 1
-    }
-    activeStep.value = passed
-  }
-  const onScroll = () => {
-    if (ticking) return
-    ticking = true
-    requestAnimationFrame(updateProgress)
-  }
-  window.addEventListener('scroll', onScroll, { passive: true })
-  window.addEventListener('resize', onScroll, { passive: true })
-  updateProgress()
-  onScrollCleanup = () => {
-    window.removeEventListener('scroll', onScroll)
-    window.removeEventListener('resize', onScroll)
-  }
+  ;[...desktopStepRefs.value, ...mobileStepRefs.value].forEach((el) => {
+    if (el) stepObserver?.observe(el)
+  })
 })
 
 onBeforeUnmount(() => {
-  revealObserver?.disconnect()
-  onScrollCleanup?.()
+  stepObserver?.disconnect()
 })
 </script>
 
 <template>
   <section ref="sectionRef" class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="prep-heading">
     <Container>
-      <!-- Header -->
-      <div class="max-w-3xl">
-        <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
-          <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
-          PERSIAPAN UMROH MANDIRI
-        </p>
-        <h2 id="prep-heading" class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
-          Apa Saja yang Perlu Disiapkan untuk Umroh Mandiri?
-        </h2>
-        <p class="mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75">
-          Tidak perlu memahami semuanya sekaligus. Kenali dulu kebutuhan perjalanan, dokumen, manasik, dan layanan pendukung agar persiapan Umroh lebih terarah.
-        </p>
-      </div>
+      <!-- Desktop: anchored context + page-scrolling timeline -->
+      <div class="hidden md:grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-start md:gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
+        <div class="md:sticky md:top-24">
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+            <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+            PERSIAPAN UMROH MANDIRI
+          </p>
+          <h2 id="prep-heading" class="mt-4 max-w-xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance lg:text-4xl">
+            Apa Saja yang Perlu Disiapkan untuk Umroh Mandiri?
+          </h2>
+          <p class="mt-5 max-w-xl text-base leading-relaxed text-sht-charcoal/75">
+            Tidak perlu memahami semuanya sekaligus. Kenali dulu kebutuhan perjalanan, dokumen, manasik, dan layanan pendukung agar persiapan Umroh lebih terarah.
+          </p>
+        </div>
 
-      <!-- ══ DESKTOP: horizontal timeline (md+) ══ -->
-      <div class="relative mt-16 hidden md:block">
-        <!-- garis dasar -->
-        <div class="absolute left-[8%] right-[8%] top-[19px] h-px bg-sht-stone" aria-hidden="true" />
-        <!-- garis isi gold — reveal sekali -->
-        <div
-          class="absolute left-[8%] right-[8%] top-[19px] h-px origin-left bg-sht-gold"
-          :class="ready && !reducedMotion ? 'transition-transform duration-[1200ms] ease-out' : ''"
-          :style="revealed ? { transform: 'scaleX(1)' } : { transform: 'scaleX(0)' }"
-          aria-hidden="true"
-        />
-        <ol class="grid grid-cols-5 gap-6" aria-label="Lima tahap persiapan Umroh Mandiri">
-          <li
-            v-for="(step, i) in steps"
-            :key="step.number"
-            :class="ready && !revealed ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'"
-            :style="{
-              transition: ready && !reducedMotion ? `opacity 600ms ease-out ${i * 110}ms, transform 600ms ease-out ${i * 110}ms` : 'none',
-            }"
-          >
-            <span
-              class="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-sht-off-white font-heading text-sm font-semibold"
-              :class="activeStep > i ? 'border-sht-gold bg-sht-gold text-sht-olive-dark' : 'border-sht-sage/50 text-sht-olive'"
-              aria-hidden="true"
-            >
-              {{ step.number }}
-            </span>
-            <h3 class="mt-4 font-heading text-lg font-semibold leading-snug text-sht-olive-dark">{{ step.title }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-sht-charcoal/70">{{ step.description }}</p>
-            <NuxtLink
-              v-if="step.link"
-              :to="step.link.to"
-              class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-sht-olive underline-offset-4 transition-colors hover:text-sht-olive-dark hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sht-gold"
-            >
-              {{ step.link.label }}
-              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" />
-              </svg>
-            </NuxtLink>
-          </li>
-        </ol>
-      </div>
-
-      <!-- ══ MOBILE: vertical journey (di bawah md) ══ -->
-      <div class="relative mt-12 md:hidden">
-        <ol class="relative" aria-label="Lima tahap persiapan Umroh Mandiri">
-          <!-- rail dasar -->
-          <div class="absolute bottom-3 left-[19px] top-3 w-px bg-sht-stone" aria-hidden="true" />
-          <!-- rail gold — tinggi mengikuti scroll (nonaktif saat reduced-motion) -->
+        <div class="relative min-w-0 md:pt-2">
+          <div class="absolute bottom-10 left-5 top-10 w-px bg-sht-stone" aria-hidden="true" />
           <div
-            v-if="!reducedMotion"
-            class="absolute left-[19px] top-3 w-px bg-sht-gold transition-[height] duration-150 ease-out"
-            :style="{ height: railPx + 'px' }"
+            class="absolute left-5 top-10 w-px origin-top bg-sht-gold transition-[height] duration-500 ease-out"
+            :class="ready && !reducedMotion ? '' : 'transition-none'"
+            :style="{ height: progressHeight }"
             aria-hidden="true"
           />
-          <li v-for="(step, i) in steps" :key="step.number" :ref="(el) => setStepRef(el, i)" class="relative flex gap-5 pb-10 last:pb-0">
-            <span
-              class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-sht-off-white font-heading text-sm font-semibold transition-colors duration-300"
-              :class="activeStep > i ? 'border-sht-gold bg-sht-gold text-sht-olive-dark' : 'border-sht-sage/50 text-sht-olive'"
-              aria-hidden="true"
+          <ol class="relative space-y-12" aria-label="Lima tahap persiapan Umroh Mandiri">
+            <li
+              v-for="(step, i) in steps"
+              :key="step.number"
+              :ref="(el) => setStepRef('desktop', el, i)"
+              :data-step-index="i"
+              :aria-current="activeStep === i ? 'step' : undefined"
+              class="relative flex min-h-[236px] gap-6"
             >
-              {{ step.number }}
-            </span>
-            <div class="min-w-0 pt-1">
-              <h3 class="font-heading text-lg font-semibold leading-snug text-sht-olive-dark">{{ step.title }}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-sht-charcoal/70">{{ step.description }}</p>
-              <NuxtLink
-                v-if="step.link"
-                :to="step.link.to"
-                class="mt-3 inline-flex min-h-[40px] items-center gap-1.5 text-sm font-semibold text-sht-olive underline-offset-4 hover:text-sht-olive-dark hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sht-gold"
+              <span
+                class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-sht-off-white font-heading text-sm font-semibold transition-colors duration-500"
+                :class="activeStep === i || i < activeStep ? 'border-sht-gold bg-sht-gold text-sht-olive-dark' : 'border-sht-sage/50 text-sht-olive'"
+                aria-hidden="true"
               >
-                {{ step.link.label }}
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" />
-                </svg>
-              </NuxtLink>
-            </div>
-          </li>
-        </ol>
+                {{ step.number }}
+              </span>
+              <div
+                class="min-w-0 flex-1 rounded-2xl border px-6 py-5 transition-[background-color,border-color,opacity,transform] duration-500 lg:px-7 lg:py-6"
+                :class="activeStep === i ? 'translate-x-0 border-sht-gold/70 bg-white opacity-100' : i < activeStep ? 'translate-x-0 border-sht-stone bg-sht-stone/30 opacity-80' : 'translate-x-1 border-transparent bg-sht-stone/20 opacity-60'"
+              >
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Tahap {{ step.number }}</p>
+                <h3 class="mt-2 font-heading text-xl font-semibold leading-snug text-sht-olive-dark lg:text-2xl">{{ step.title }}</h3>
+                <p class="mt-3 max-w-xl text-sm leading-relaxed text-sht-charcoal/70 lg:text-base">{{ step.description }}</p>
+                <NuxtLink
+                  v-if="step.link"
+                  :to="step.link.to"
+                  class="mt-4 inline-flex min-h-[40px] items-center gap-1.5 text-sm font-semibold text-sht-olive underline-offset-4 transition-colors hover:text-sht-olive-dark hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sht-gold"
+                >
+                  {{ step.link.label }}
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" />
+                  </svg>
+                </NuxtLink>
+              </div>
+            </li>
+          </ol>
+        </div>
       </div>
 
-      <!-- Closing: lanjutan cerita edukasi (restrained) -->
+      <!-- Mobile: single-column page-scrolling storytelling -->
+      <div class="md:hidden">
+        <div>
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+            <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+            PERSIAPAN UMROH MANDIRI
+          </p>
+          <h2 id="prep-heading-mobile" class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
+            Apa Saja yang Perlu Disiapkan untuk Umroh Mandiri?
+          </h2>
+          <p class="mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75">
+            Tidak perlu memahami semuanya sekaligus. Kenali dulu kebutuhan perjalanan, dokumen, manasik, dan layanan pendukung agar persiapan Umroh lebih terarah.
+          </p>
+        </div>
+
+        <div class="relative mt-14">
+          <div class="absolute bottom-10 left-5 top-10 w-px bg-sht-stone" aria-hidden="true" />
+          <div
+            class="absolute left-5 top-10 w-px origin-top bg-sht-gold transition-[height] duration-500 ease-out"
+            :class="ready && !reducedMotion ? '' : 'transition-none'"
+            :style="{ height: progressHeight }"
+            aria-hidden="true"
+          />
+          <ol class="relative space-y-8" aria-label="Lima tahap persiapan Umroh Mandiri">
+            <li
+              v-for="(step, i) in steps"
+              :key="step.number"
+              :ref="(el) => setStepRef('mobile', el, i)"
+              :data-step-index="i"
+              :aria-current="activeStep === i ? 'step' : undefined"
+              class="relative flex min-h-[196px] gap-5"
+            >
+              <span
+                class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-sht-off-white font-heading text-sm font-semibold transition-colors duration-500"
+                :class="activeStep === i || i < activeStep ? 'border-sht-gold bg-sht-gold text-sht-olive-dark' : 'border-sht-sage/50 text-sht-olive'"
+                aria-hidden="true"
+              >
+                {{ step.number }}
+              </span>
+              <div
+                class="min-w-0 flex-1 rounded-2xl border px-5 py-5 transition-[background-color,border-color,opacity,transform] duration-500"
+                :class="activeStep === i ? 'translate-x-0 border-sht-gold/70 bg-white opacity-100' : i < activeStep ? 'translate-x-0 border-sht-stone bg-sht-stone/30 opacity-80' : 'translate-x-1 border-transparent bg-sht-stone/20 opacity-60'"
+              >
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Tahap {{ step.number }}</p>
+                <h3 class="mt-2 font-heading text-xl font-semibold leading-snug text-sht-olive-dark">{{ step.title }}</h3>
+                <p class="mt-3 text-sm leading-relaxed text-sht-charcoal/70">{{ step.description }}</p>
+                <NuxtLink
+                  v-if="step.link"
+                  :to="step.link.to"
+                  class="mt-4 inline-flex min-h-[40px] items-center gap-1.5 text-sm font-semibold text-sht-olive underline-offset-4 hover:text-sht-olive-dark hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sht-gold"
+                >
+                  {{ step.link.label }}
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" />
+                  </svg>
+                </NuxtLink>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Existing closing callout preserved -->
       <div class="mt-16 border-t border-sht-stone pt-12 text-center">
         <h3 class="font-heading text-2xl font-semibold text-sht-olive-dark text-balance sm:text-3xl">
           {{ closing.heading }}
