@@ -91,7 +91,10 @@ const serviceCards = [
     <!-- 3. GAMBARAN BIAYA (M4A.3 — cost composition education) -->
     <CostBreakdownSection />
 
-    <!-- 4. VALUE PROPOSITION -->
+    <!-- 4. BANTUAN SESUAI KEBUTUHAN (M4A.4 — assistance tabs) -->
+    <AssistanceTabs />
+
+    <!-- 5. VALUE PROPOSITION -->
     <section class="py-14 sm:py-20">
       <Container>
         <SectionHeader
