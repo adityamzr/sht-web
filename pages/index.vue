@@ -88,7 +88,10 @@ const serviceCards = [
     <!-- 2. PERSIAPAN UMROH MANDIRI (M4A.2 — education timeline) -->
     <PreparationTimeline />
 
-    <!-- 2. VALUE PROPOSITION -->
+    <!-- 3. GAMBARAN BIAYA (M4A.3 — cost composition education) -->
+    <CostBreakdownSection />
+
+    <!-- 4. VALUE PROPOSITION -->
     <section class="py-14 sm:py-20">
       <Container>
         <SectionHeader
