@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <section class="relative isolate overflow-hidden bg-sht-olive">
+  <section class="relative isolate flex min-h-screen min-h-[100svh] items-center overflow-hidden bg-sht-olive">
     <!-- Background: aset Ka'bah existing (dekoratif — informasi tidak bergantung padanya) -->
     <img
       src="/images/hero-makkah.jpg"

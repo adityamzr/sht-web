@@ -11,6 +11,7 @@ useSeoMeta({
 })
 
 const { services, pending, error, refresh } = useServices()
+const route = useRoute()
 const config = useRuntimeConfig()
 const { whatsappNumber } = useSiteConfig()
 const waUrl = whatsappLink()
@@ -32,6 +33,17 @@ function closeInquiry() {
   inquiryService.value = null
   iDone.value = null
 }
+
+// Deep-link dari halaman layanan khusus, tanpa membuat ulang alur inquiry.
+watch(
+  [services, () => route.query.service],
+  ([availableServices, serviceCode]) => {
+    if (serviceCode !== 'visa' || inquiryService.value) return
+    const service = availableServices.find((item) => item.code?.toLowerCase() === 'visa')
+    if (service) openInquiry(service)
+  },
+  { immediate: true },
+)
 
 async function submitInquiry() {
   iError.value = null
