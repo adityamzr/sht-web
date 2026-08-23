@@ -1,10 +1,15 @@
-import { mockFlights } from '~/data/mock/flights'
 import type { Flight } from '~/types'
+import { mapFlight, type ApiFlight } from '~/utils/mappers'
 
-/** Data-access layer — FLIGHT. Phase berikutnya: GET /api/flights */
+/** Data-access layer — FLIGHT (GET /api/v1/flights, sht-admin). */
 export function useFlights() {
-  const fetchFlights = async (): Promise<Flight[]> =>
-    mockFlights.filter((f) => f.status === 'active')
+  const config = useRuntimeConfig()
+  const { data, pending, error, refresh } = useFetch<{ data: ApiFlight[] }>(
+    `${config.public.apiBaseUrl}/api/v1/flights`,
+    { default: () => ({ data: [] }) },
+  )
 
-  return { fetchFlights }
+  const flights = computed<Flight[]>(() => (data.value?.data ?? []).map(mapFlight))
+
+  return { flights, pending, error, refresh }
 }

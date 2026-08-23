@@ -2,143 +2,227 @@
 useSeoMeta({
   title: 'Estimator Biaya Umroh — Sudut Haramain Tour',
   description:
-    'Hitung estimasi biaya Umroh private berdasarkan jumlah jamaah, durasi, hotel, penerbangan, dan kebutuhan lainnya.',
+    'Hitung estimasi biaya Umroh private berdasarkan jumlah jamaah, durasi, hotel, penerbangan, dan kebutuhan lainnya — gratis, tanpa komitmen.',
   ogTitle: 'Estimator Biaya Umroh — Sudut Haramain Tour',
-  ogDescription: 'Hitung estimasi perjalanan Umroh private Anda — gratis, tanpa komitmen.',
+  ogDescription: 'Susun perjalanan Umroh private Anda langkah demi langkah, dan lihat estimasi biayanya.',
 })
 
 const store = useEstimatorStore()
-const { draft } = storeToRefs(store)
-const waUrl = whatsappLink()
+store.reset() // mulai bersih setiap masuk halaman estimator
 
-const steps = [
-  { num: 1, label: 'Jamaah & Jadwal', active: true },
-  { num: 2, label: 'Hotel & Penerbangan', active: false },
-  { num: 3, label: 'Transportasi & Layanan', active: false },
-  { num: 4, label: 'Review & Estimasi', active: false },
-]
+// Data nyata dari backend (sht-admin) — composable memuat via /api/v1.
+const { hotels, pending: hotelsPending, error: hotelsError, refresh: refreshHotels } = useHotels()
+const { flights, pending: flightsPending, error: flightsError, refresh: refreshFlights } = useFlights()
+const { routeOptions, pending: transportPending, error: transportError, refresh: refreshTransport } = useTransportations()
+const { services, pending: servicesPending, error: servicesError, refresh: refreshServices } = useServices()
+const { visa, pending: visaPending, error: visaError, refresh: refreshVisa } = useVisa()
+const { cities, pending: citiesPending, error: citiesError, refresh: refreshCities } = useDepartures()
+
+const isPending = computed(
+  () => hotelsPending.value || flightsPending.value || transportPending.value || servicesPending.value || visaPending.value || citiesPending.value,
+)
+const loadError = computed(
+  () =>
+    hotelsError.value || flightsError.value || transportError.value || servicesError.value || visaError.value || citiesError.value || null,
+)
+
+const flow = useEstimatorFlow(() => ({
+  hotels: hotels.value,
+  flights: flights.value,
+  routeOptions: routeOptions.value,
+  visa: visa.value,
+  services: services.value,
+  departureCities: cities.value,
+}))
+
+const {
+  steps,
+  breakdown,
+  isStepValid,
+  stepMessage,
+  makkahHotels,
+  madinahHotels,
+  additionalServices,
+  selectedFlight,
+  makkahHotel,
+  madinahHotel,
+  departure,
+  nightsRemaining,
+  editStepFor,
+} = flow
+
+const currentMeta = computed(() => steps.find((s) => s.n === store.currentStep)!)
+const isReview = computed(() => store.currentStep === steps.length)
+const canProceed = computed(() => isStepValid(store.currentStep))
+const currentMessage = computed(() => stepMessage(store.currentStep))
+const departureCityName = computed(() => departure.value?.name ?? null)
+
+function onNext() {
+  if (!canProceed.value) return
+  store.next()
+  scrollToTop()
+}
+function onBack() {
+  store.back()
+  scrollToTop()
+}
+function onEdit(step: number) {
+  store.goToStep(step)
+  scrollToTop()
+}
+function scrollToTop() {
+  if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+function onRetry() {
+  refreshHotels()
+  refreshFlights()
+  refreshTransport()
+  refreshServices()
+  refreshVisa()
+  refreshCities()
+}
 </script>
 
 <template>
-  <div>
-    <section class="bg-sky-gradient py-12 sm:py-16">
+  <div class="bg-neutral-soft pb-28 lg:pb-0">
+    <!-- Header section -->
+    <section class="bg-sky-gradient py-10 sm:py-14">
       <Container>
-        <SectionHeader
-          align="center"
-          eyebrow="Estimator Biaya"
-          title="Berapa biaya Umroh Private Anda?"
-          subtitle="Jawab beberapa pertanyaan singkat — kami tunjukkan gambaran biayanya. Gratis dan tanpa komitmen."
-        />
-      </Container>
-    </section>
-
-    <section class="py-12 sm:py-16">
-      <Container>
-        <!-- Step indicator -->
-        <ol class="mx-auto flex max-w-2xl items-start justify-between gap-2" aria-label="Tahapan estimator">
-          <li v-for="(step, i) in steps" :key="step.num" class="flex flex-1 flex-col items-center gap-2 text-center">
-            <span
-              class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold"
-              :class="step.active ? 'bg-brand-green text-white' : 'bg-neutral-warm text-neutral-charcoal/50'"
-              aria-hidden="true"
-            >
-              {{ step.num }}
-            </span>
-            <span class="hidden text-xs font-medium sm:block" :class="step.active ? 'text-brand-green' : 'text-neutral-charcoal/50'">
-              {{ step.label }}
-            </span>
-            <span v-if="i < steps.length - 1" class="absolute" aria-hidden="true" />
-          </li>
-        </ol>
-
-        <!-- Shell form (Phase 1: mock, tanpa kalkulasi) -->
-        <div class="mx-auto mt-10 max-w-2xl rounded-card border border-neutral-line bg-white p-6 shadow-card sm:p-8">
-          <h2 class="font-heading text-xl font-semibold">Mulai dari yang paling dasar</h2>
-          <p class="mt-1.5 text-sm text-neutral-charcoal/60">
-            Estimator lengkap sedang kami siapkan untuk Anda. Ini gambaran awalnya:
-          </p>
-
-          <div class="mt-6 space-y-5">
-            <!-- Jumlah jamaah -->
-            <div>
-              <label for="pilgrims" class="text-sm font-semibold">Berapa jamaah yang akan berangkat?</label>
-              <div class="mt-2 flex items-center gap-4">
-                <input
-                  id="pilgrims"
-                  v-model.number="draft.pilgrims"
-                  type="range"
-                  min="1"
-                  max="20"
-                  class="h-2 w-full cursor-pointer appearance-none rounded-full bg-neutral-warm accent-brand-green"
-                />
-                <span class="w-20 rounded-card bg-brand-sky/50 px-3 py-2 text-center font-heading text-lg font-semibold text-brand-green">
-                  {{ draft.pilgrims }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Kota keberangkatan -->
-            <fieldset>
-              <legend class="text-sm font-semibold">Berangkat dari mana?</legend>
-              <div class="mt-2 grid grid-cols-2 gap-3">
-                <button
-                  v-for="city in ['Jakarta', 'Bandung'] as const"
-                  :key="city"
-                  type="button"
-                  class="min-h-[48px] rounded-card border px-4 py-3 text-sm font-semibold transition-colors"
-                  :class="
-                    draft.departureCity === city
-                      ? 'border-brand-green bg-brand-green/5 text-brand-green'
-                      : 'border-neutral-line text-neutral-charcoal/70 hover:border-brand-teal'
-                  "
-                  @click="draft.departureCity = city"
-                >
-                  {{ city }}
-                </button>
-              </div>
-            </fieldset>
-
-            <!-- Durasi -->
-            <div>
-              <label for="duration" class="text-sm font-semibold">Berapa hari perjalanan Anda?</label>
-              <div class="mt-2 grid grid-cols-3 gap-3">
-                <button
-                  v-for="days in [9, 12, 16]"
-                  :key="days"
-                  type="button"
-                  class="min-h-[48px] rounded-card border px-4 py-3 text-sm font-semibold transition-colors"
-                  :class="
-                    draft.durationDays === days
-                      ? 'border-brand-green bg-brand-green/5 text-brand-green'
-                      : 'border-neutral-line text-neutral-charcoal/70 hover:border-brand-teal'
-                  "
-                  @click="draft.durationDays = days"
-                >
-                  {{ days }} hari
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Coming soon notice -->
-          <div class="mt-8 rounded-card border border-gold-soft bg-gold-sand/50 p-5">
-            <p class="text-sm leading-relaxed text-neutral-charcoal/80">
-              <span class="font-semibold text-brand-green">Segera hadir:</span> kalkulasi otomatis dengan
-              pilihan hotel Makkah &amp; Madinah, penerbangan, transportasi, hingga layanan tambahan —
-              lengkap dengan rincian per komponen.
-            </p>
-          </div>
-
-          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-            <AppButton :href="waUrl" variant="whatsapp" external block class="sm:flex-1">
-              Hitung Manual via WhatsApp
-            </AppButton>
-          </div>
-          <p class="mt-4 text-center text-xs text-neutral-charcoal/50">
-            Untuk saat ini, konsultan kami siap menghitungkan estimasi Anda secara personal.
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">Estimator Biaya</p>
+          <h1 class="mt-3 font-heading text-3xl font-semibold text-neutral-charcoal sm:text-4xl">
+            Susun perjalanan Umroh Anda
+          </h1>
+          <p class="mt-3 text-sm leading-relaxed text-neutral-charcoal/70 sm:text-base">
+            Beberapa pertanyaan singkat, satu per satu — dan estimasi biaya Anda akan terbentuk.
+            Gratis, tanpa komitmen.
           </p>
         </div>
       </Container>
     </section>
+
+    <!-- Loading -->
+    <section v-if="isPending" class="py-24">
+      <Container>
+        <div class="mx-auto max-w-md rounded-card border border-neutral-line bg-white p-10 text-center shadow-card">
+          <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand-sky border-t-brand-green" aria-hidden="true" />
+          <p class="mt-4 text-sm font-medium text-neutral-charcoal/70">Memuat pilihan perjalanan Anda…</p>
+        </div>
+      </Container>
+    </section>
+
+    <!-- Error load -->
+    <section v-else-if="loadError" class="py-24">
+      <Container>
+        <div class="mx-auto max-w-md rounded-card border border-gold-soft bg-gold-sand/50 p-10 text-center">
+          <p class="font-heading text-lg font-semibold">Koneksi terganggu</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">
+            Kami kesulitan memuat data perjalanan. Silakan coba lagi dalam beberapa saat.
+          </p>
+          <AppButton variant="primary" class="mt-5" @click="onRetry"> Coba Lagi </AppButton>
+        </div>
+      </Container>
+    </section>
+
+    <section v-else class="py-10 sm:py-12">
+      <Container>
+        <ProgressBar
+          :current="store.currentStep"
+          :total="steps.length"
+          :title="currentMeta.title"
+        />
+
+        <!-- Review = full width; steps lain = layout 2 kolom di desktop -->
+        <StepReview
+          v-if="isReview"
+          :breakdown="breakdown"
+          :flight="selectedFlight"
+          :makkah-hotel="makkahHotel"
+          :madinah-hotel="madinahHotel"
+          :departure-city-name="departureCityName"
+          :edit-step-for="editStepFor"
+          @edit="onEdit"
+          @reset="store.reset()"
+        />
+
+        <div v-else class="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <!-- Kolom kiri: step aktif -->
+          <div>
+            <StepPilgrims v-if="currentMeta.id === 'pilgrims'" />
+            <StepDeparture v-else-if="currentMeta.id === 'departure'" :cities="cities" />
+            <StepSchedule v-else-if="currentMeta.id === 'schedule'" />
+            <StepNights
+              v-else-if="currentMeta.id === 'nights'"
+              :nights-remaining="nightsRemaining"
+              :max-nights="store.maxNights"
+            />
+            <StepFlight v-else-if="currentMeta.id === 'flight'" :flights="flights" :pilgrims="store.pilgrims" />
+            <StepHotel
+              v-else-if="currentMeta.id === 'hotelMakkah'"
+              :hotels="makkahHotels"
+              city="Makkah"
+              city-key="makkah"
+              :nights="store.makkahNights"
+            />
+            <StepRooms
+              v-else-if="currentMeta.id === 'roomsMakkah'"
+              :hotel="makkahHotel"
+              city="Makkah"
+              city-key="makkah"
+              :nights="store.makkahNights"
+              :pilgrims="store.pilgrims"
+            />
+            <StepHotel
+              v-else-if="currentMeta.id === 'hotelMadinah'"
+              :hotels="madinahHotels"
+              city="Madinah"
+              city-key="madinah"
+              :nights="store.madinahNights"
+            />
+            <StepRooms
+              v-else-if="currentMeta.id === 'roomsMadinah'"
+              :hotel="madinahHotel"
+              city="Madinah"
+              city-key="madinah"
+              :nights="store.madinahNights"
+              :pilgrims="store.pilgrims"
+            />
+            <StepTransport
+              v-else-if="currentMeta.id === 'transport'"
+              :route-options="routeOptions"
+              :pilgrims="store.pilgrims"
+            />
+            <StepVisa v-else-if="currentMeta.id === 'visa'" :visa-product="visa" :pilgrims="store.pilgrims" />
+            <StepServices v-else-if="currentMeta.id === 'services'" :services="additionalServices" :pilgrims="store.pilgrims" />
+
+            <NavButtons
+              :is-first="store.currentStep === 1"
+              :can-proceed="canProceed"
+              :message="currentMessage"
+              @back="onBack"
+              @next="onNext"
+            />
+          </div>
+
+          <!-- Kolom kanan: summary persisten (desktop) -->
+          <SummaryPanel
+            class="hidden lg:block"
+            :breakdown="breakdown"
+            :pilgrims="store.pilgrims"
+            :duration-days="store.durationDays"
+            :departure-city-name="departureCityName"
+          />
+        </div>
+      </Container>
+    </section>
+
+    <!-- Sticky summary (mobile) -->
+    <MobileSummaryBar
+      v-if="!isReview && !isPending && !loadError"
+      :breakdown="breakdown"
+      :pilgrims="store.pilgrims"
+      :duration-days="store.durationDays"
+      :departure-city-name="departureCityName"
+    />
   </div>
 </template>

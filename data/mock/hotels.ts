@@ -1,8 +1,9 @@
 import type { Hotel } from '~/types'
 
 /**
- * MOCK DATA — akan digantikan response GET /api/hotels (Laravel) di fase berikutnya.
+ * MOCK DATA — akan digantikan response GET /api/hotels (SHT REST API — sht-admin) di fase berikutnya.
  * Harga = SELLING PRICE (supplier cost/markup tidak pernah masuk sini).
+ * roomTypes: Double/Triple/Quad dengan harga per kamar per malam.
  */
 export const mockHotels: Hotel[] = [
   {
@@ -18,6 +19,11 @@ export const mockHotels: Hotel[] = [
     startingPrice: 4500000,
     currency: 'IDR',
     status: 'active',
+    roomTypes: [
+      { id: 'double', name: 'Double', capacity: 2, pricePerNight: 5300000 },
+      { id: 'triple', name: 'Triple', capacity: 3, pricePerNight: 4700000 },
+      { id: 'quad', name: 'Quad', capacity: 4, pricePerNight: 4500000 },
+    ],
   },
   {
     id: 'HTL-002',
@@ -32,6 +38,11 @@ export const mockHotels: Hotel[] = [
     startingPrice: 4100000,
     currency: 'IDR',
     status: 'active',
+    roomTypes: [
+      { id: 'double', name: 'Double', capacity: 2, pricePerNight: 4800000 },
+      { id: 'triple', name: 'Triple', capacity: 3, pricePerNight: 4300000 },
+      { id: 'quad', name: 'Quad', capacity: 4, pricePerNight: 4100000 },
+    ],
   },
   {
     id: 'HTL-003',
@@ -46,6 +57,11 @@ export const mockHotels: Hotel[] = [
     startingPrice: 3800000,
     currency: 'IDR',
     status: 'active',
+    roomTypes: [
+      { id: 'double', name: 'Double', capacity: 2, pricePerNight: 4400000 },
+      { id: 'triple', name: 'Triple', capacity: 3, pricePerNight: 4000000 },
+      { id: 'quad', name: 'Quad', capacity: 4, pricePerNight: 3800000 },
+    ],
   },
   {
     id: 'HTL-004',
@@ -60,5 +76,10 @@ export const mockHotels: Hotel[] = [
     startingPrice: 2900000,
     currency: 'IDR',
     status: 'active',
+    roomTypes: [
+      { id: 'double', name: 'Double', capacity: 2, pricePerNight: 3400000 },
+      { id: 'triple', name: 'Triple', capacity: 3, pricePerNight: 3100000 },
+      { id: 'quad', name: 'Quad', capacity: 4, pricePerNight: 2900000 },
+    ],
   },
 ]

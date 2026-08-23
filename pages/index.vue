@@ -1,21 +1,18 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Sudut Haramain Tour — Umroh Private, Sesuai Cara Anda',
+  title: 'Sudut Haramain Tour — Umroh Mandiri & Land Arrangement',
   description:
-    'Rencanakan Umroh private Anda sendiri: pilih jadwal, hotel, penerbangan, dan layanan. Sudut Haramain Tour menyiapkan semuanya — tenang, jelas, dan terpercaya.',
-  ogTitle: 'Sudut Haramain Tour — Umroh Private, Sesuai Cara Anda',
-  ogDescription: 'Susun perjalanan Umroh sesuai cara Anda. Kami siapkan visa, penerbangan, hotel, hingga transportasi.',
+    'Jalani Umroh mandiri tanpa repot sendiri. Sudut Haramain membantu menyiapkan hotel, transportasi, visa, muthawwif, handling, dan berbagai kebutuhan perjalanan lainnya — sesuai rencana Anda.',
+  ogTitle: 'Sudut Haramain Tour — Umroh Mandiri & Land Arrangement',
+  ogDescription:
+    'Jalani Umroh mandiri tanpa repot sendiri. Hotel, transportasi, visa, muthawwif, handling — kami bantu siapkan sesuai kebutuhan perjalanan Anda.',
   ogImage: '/images/hero-makkah.jpg',
 })
 
-const { fetchFeaturedHotels } = useHotels()
+const { featured, pending: hotelsPending, error: hotelsError } = useHotels()
 const { fetchTestimonials, fetchFaqs } = useContent()
 
-const [hotels, testimonials, faqs] = await Promise.all([
-  fetchFeaturedHotels(3),
-  fetchTestimonials(),
-  fetchFaqs(),
-])
+const [testimonials, faqs] = await Promise.all([fetchTestimonials(), fetchFaqs()])
 
 const whyPoints = [
   {
@@ -87,6 +84,9 @@ const serviceCards = [
   <div>
     <!-- 1. HERO -->
     <HeroSection />
+
+    <!-- 2. PERSIAPAN UMROH MANDIRI (M4A.2 — education timeline) -->
+    <PreparationTimeline />
 
     <!-- 2. VALUE PROPOSITION -->
     <section class="py-14 sm:py-20">
@@ -179,8 +179,14 @@ const serviceCards = [
           />
           <AppButton to="/hotels" variant="outline" class="shrink-0"> Lihat Katalog Hotel </AppButton>
         </div>
-        <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <HotelCard v-for="hotel in hotels" :key="hotel.id" :hotel="hotel" />
+        <div v-if="hotelsPending" class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="n in 3" :key="n" class="h-64 animate-pulse rounded-card bg-neutral-line/40" aria-hidden="true" />
+        </div>
+        <div v-else-if="hotelsError" class="mt-12 rounded-card border border-gold-soft bg-gold-sand/50 p-6 text-center">
+          <p class="text-sm text-neutral-charcoal/70">Katalog hotel sedang tidak dapat dimuat. Silakan kunjungi halaman hotel atau coba lagi nanti.</p>
+        </div>
+        <div v-else class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <HotelCard v-for="hotel in featured" :key="hotel.id" :hotel="hotel" />
         </div>
       </Container>
     </section>

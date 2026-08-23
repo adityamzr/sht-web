@@ -1,7 +1,9 @@
 /**
  * Konfigurasi situs terpusat.
- * whatsappNumber diambil dari runtimeConfig (public) — placeholder Phase 1.
- * Flow WhatsApp lead (dengan Estimation ID) diimplementasikan Phase 2.
+ * whatsappNumber diambil dari runtimeConfig (public) — placeholder M0:
+ * NILAI PRODUKSI (nomor resmi SHT) WAJIB diisi sebelum deployment.
+ * Flow WhatsApp lead (dengan Estimation ID) diimplementasikan pada M8
+ * (backend create lead dulu, baru buka WhatsApp).
  */
 export function useSiteConfig() {
   const config = useRuntimeConfig()
