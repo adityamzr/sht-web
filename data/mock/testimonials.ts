@@ -16,7 +16,7 @@ export const mockTestimonials: Testimonial[] = [
     origin: 'Jakarta',
     quote:
       'Awalnya ragu umroh tanpa rombongan besar. Ternyata dengan pendamping yang sabar, ibadah jadi jauh lebih khusyuk. Hotelnya dekat sekali dengan Masjidil Haram.',
-    tripType: 'Umroh Private · 9 hari',
+    tripType: 'Umroh Mandiri · 9 hari',
   },
   {
     id: 'TST-003',
