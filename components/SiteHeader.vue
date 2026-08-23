@@ -29,7 +29,13 @@ onMounted(() => {
 
 onBeforeUnmount(() => window.removeEventListener('scroll', updateScrollState))
 
-const navItems = [{ label: 'Panduan', to: '/guides' }]
+const navItems = [
+  { label: 'Panduan', to: '/guides', icon: 'guide' },
+  // Dedicated routes belum tersedia; gunakan destination valid terdekat sampai milestone konten berikutnya.
+  { label: 'Artikel', to: '/guides', icon: 'article' },
+  { label: 'Cerita Jamaah', to: '/', icon: 'stories' },
+  { label: 'FAQ', to: '/guides', icon: 'faq' },
+]
 const serviceMenu = [
   { label: 'Visa Umroh', subtitle: 'Pengurusan visa untuk perjalanan Umroh.', to: '/services/visa', icon: 'visa' },
   { label: 'Badal Umroh', subtitle: 'Pelaksanaan Badal Umroh sesuai amanah keluarga.', to: '/services', icon: 'badal' },
@@ -64,7 +70,7 @@ watch(
           <img src="/assets/images/sht_horizontal_black_logo.png" alt="" class="h-12 w-auto" />
         </NuxtLink>
 
-        <nav class="hidden items-center gap-7 lg:flex" aria-label="Navigasi utama">
+        <nav class="hidden items-center gap-5 lg:flex" aria-label="Navigasi utama">
           <div class="relative" @mouseenter="openServicesMenu" @mouseleave="scheduleServicesClose">
             <button type="button" class="inline-flex items-center gap-1.5 text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark" :aria-expanded="isServicesOpen" aria-controls="services-menu" @click="isServicesOpen = !isServicesOpen" @keydown.esc="isServicesOpen = false">
               Layanan
@@ -124,8 +130,18 @@ watch(
                 {{ item.label }}
               </NuxtLink>
             </div>
-            <NuxtLink to="/guides" class="mt-2 block rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">Panduan</NuxtLink>
-            <div class="mt-3 flex flex-col gap-2 px-1 pb-2"><AppButton to="/estimator" variant="gold" block>Hitung Estimasi Umroh</AppButton><AppButton :href="waUrl" variant="ghost" block external class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark">Konsultasi via WhatsApp</AppButton></div>
+            <div class="mt-2 space-y-1 border-t border-sht-stone/70 pt-2">
+              <NuxtLink v-for="item in navItems" :key="item.label" :to="item.to" class="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sht-gold/15 text-sht-olive" aria-hidden="true">
+                  <svg v-if="item.icon === 'guide'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 5.5A2.5 2.5 0 0 1 7 3h4.5v16H7a2.5 2.5 0 0 0-2.5 2.5v-16Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.5A2.5 2.5 0 0 0 17 3h-4.5v16H17a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
+                  <svg v-else-if="item.icon === 'article'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="M6.5 3.5h8l3 3v14h-11a1.5 1.5 0 0 1-1.5-1.5V5a1.5 1.5 0 0 1 1.5-1.5Z"/><path stroke-linecap="round" d="M9 11h6M9 14h6M9 17h4M14.5 3.5V7h3"/></svg>
+                  <svg v-else-if="item.icon === 'stories'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="2.5"/><circle cx="16.5" cy="9" r="2"/><path stroke-linecap="round" d="M4.5 18a4.5 4.5 0 0 1 9 0M14 17a3.5 3.5 0 0 1 6 1"/></svg>
+                  <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" d="M9.8 9.5a2.3 2.3 0 1 1 3.8 1.7c-1 .8-1.6 1.2-1.6 2.5M12 17h.01"/></svg>
+                </span>
+                {{ item.label }}
+              </NuxtLink>
+            </div>
+            <div class="mt-3 flex flex-col gap-2 px-1 pb-2"><AppButton to="/estimator" variant="gold" block><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path stroke-linecap="round" d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h8"/></svg>Hitung Estimasi Umroh</AppButton><AppButton :href="waUrl" variant="ghost" block external class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5.5h14A2.5 2.5 0 0 1 21.5 8v7A2.5 2.5 0 0 1 19 17.5H11L7 21v-3.5H5A2.5 2.5 0 0 1 2.5 15V8A2.5 2.5 0 0 1 5 5.5Z"/></svg>Konsultasi via WhatsApp</AppButton></div>
           </nav>
         </Container>
       </div>
