@@ -51,14 +51,14 @@ const costRows = computed(() => [
     number: '02',
     label: 'Hotel Makkah',
     subtitle: '5 malam di Makkah',
-    note: 'Estimasi mengikuti periode perjalanan dan pilihan akomodasi.',
+    note: 'Harga mengikuti periode perjalanan dan pilihan akomodasi.',
     amount: currentSimulation.value.costs.makkahHotel,
   },
   {
     number: '03',
     label: 'Hotel Madinah',
     subtitle: '3 malam di Madinah',
-    note: 'Estimasi mengikuti periode perjalanan dan pilihan akomodasi.',
+    note: 'Harga mengikuti periode perjalanan dan pilihan akomodasi.',
     amount: currentSimulation.value.costs.madinahHotel,
   },
   {
@@ -71,7 +71,7 @@ const costRows = computed(() => [
   {
     number: '05',
     label: 'Visa',
-    subtitle: 'Pengurusan untuk 4 jamaah',
+    subtitle: '$165 per jamaah',
     note: 'Estimasi mengikuti layanan pengurusan visa yang digunakan.',
     amount: currentSimulation.value.costs.visa,
   },
@@ -105,9 +105,9 @@ function formatIdr(amount: number) {
             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sht-sage">SIMULASI PERJALANAN</p>
             <div class="mt-3 flex items-center gap-3 whitespace-nowrap text-sm font-medium text-sht-charcoal/75">
               <span>4 Jamaah</span>
-              <span class="text-sht-stone" aria-hidden="true">·</span>
+              <div class="w-1.5 h-1.5 rounded-full bg-sht-charcoal/50"></div>
               <span>9 Hari</span>
-              <span class="text-sht-stone" aria-hidden="true">·</span>
+              <div class="w-1.5 h-1.5 rounded-full bg-sht-charcoal/50"></div>
               <span>Jakarta</span>
             </div>
           </div>
@@ -170,7 +170,7 @@ function formatIdr(amount: number) {
         </div>
 
         <p class="mt-6 border-t border-sht-stone/70 pt-5 text-xs leading-relaxed text-sht-charcoal/60">
-          Simulasi ini digunakan sebagai gambaran biaya, bukan harga penawaran. Estimasi aktual dapat berubah mengikuti tanggal keberangkatan, ketersediaan, pilihan hotel dan penerbangan, kurs, jumlah jamaah, serta layanan yang dipilih.
+          Estimasi aktual dapat berubah mengikuti tanggal keberangkatan, ketersediaan, pilihan hotel dan penerbangan, kurs, jumlah jamaah, serta layanan yang dipilih.
         </p>
       </div>
 

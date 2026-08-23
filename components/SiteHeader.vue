@@ -41,18 +41,18 @@ watch(
     class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
     :class="[
       isHome ? 'fixed left-1/2 top-4 -translate-x-1/2' : 'sticky top-4',
-      isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/90',
+      isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/80',
     ]"
   >
     <Container>
       <div class="flex h-14 items-center justify-between sm:h-16">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-2.5" aria-label="Sudut Haramain Tour — Beranda">
-          <img src="/favicon.svg" alt="" class="h-9 w-9" />
-          <span class="leading-tight">
+          <img src="/assets/images/sht_horizontal_black_logo.png" alt="" class="h-12 w-full" />
+          <!-- <span class="leading-tight">
             <span class="block font-heading text-base font-semibold text-sht-olive-dark sm:text-lg">Sudut Haramain</span>
             <span class="block text-[10px] font-medium uppercase tracking-[0.24em] text-sht-gold">Tour</span>
-          </span>
+          </span> -->
         </NuxtLink>
 
         <!-- Desktop nav -->
