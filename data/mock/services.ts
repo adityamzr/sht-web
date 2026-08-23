@@ -41,7 +41,7 @@ export const mockServices: Service[] = [
   {
     id: 'SRV-004',
     code: 'handling',
-    name: 'Handling Bandara',
+    name: 'Handling Jamaah',
     description:
       'Pendampingan check-in, bagasi, hingga proses kedatangan di Jeddah/Madinah.',
     price: 500000,

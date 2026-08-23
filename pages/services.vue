@@ -120,11 +120,10 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
   <div class="bg-sht-off-white">
     <section class="border-b border-sht-stone/70 py-14 sm:py-20">
       <Container>
-        <div class="max-w-3xl">
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark"><span class="h-px w-8 bg-sht-gold" aria-hidden="true" />LAYANAN SUDUT HARAMAIN</p>
-          <h1 class="mt-4 max-w-2xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-5xl">Pilih Bantuan yang Anda Perlukan.</h1>
-          <p class="mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75 sm:text-lg">Temukan kebutuhan perjalanan dan pendampingan Umroh dalam satu tempat, lalu pilih layanan yang sesuai dengan rencana Anda.</p>
-          <p class="mt-4 text-sm font-medium text-sht-olive">Anda tidak harus menggunakan semuanya sekaligus.</p>
+        <div class="max-w-3xl mx-auto text-center">
+          <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold"><span class="h-px w-8 bg-sht-gold" aria-hidden="true" />LAYANAN SUDUT HARAMAIN<span class="h-px w-8 bg-sht-gold" aria-hidden="true" /></p>
+          <h1 class="mx-auto mt-4 max-w-2xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark sm:text-5xl">Pilih Bantuan yang Anda Perlukan.</h1>
+          <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75 sm:text-lg">Temukan kebutuhan perjalanan dan pendampingan Umroh dalam satu tempat, lalu pilih layanan yang sesuai dengan rencana Anda.</p>
         </div>
         <div v-if="pending" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><div v-for="n in 6" :key="n" class="h-56 animate-pulse rounded-2xl bg-sht-stone/60" aria-hidden="true" /></div>
         <div v-else-if="error" class="mt-10 rounded-2xl border border-sht-stone bg-white p-8 text-center"><p class="text-sm text-sht-charcoal/70">Kami kesulitan memuat layanan. Silakan coba lagi.</p><AppButton variant="gold" class="mt-4" @click="refresh">Coba Lagi</AppButton></div>
@@ -151,10 +150,18 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
             </div>
           </article>
         </div>
+
+        <div class="flex flex-col sm:flex-row justify-between rounded-3xl bg-sht-olive px-6 py-8 text-center mt-12 sm:mt-16 sm:mb-24">
+          <div class="text-center sm:text-start">
+            <span class="mt-3 max-w-2xl font-heading text-lg font-semibold text-sht-off-white sm:text-2xl">Belum Menemukan yang Anda Butuhkan?</span>
+            <p class="mt-3 max-w-2xl text-xs leading-relaxed text-sht-off-white/75">Ceritakan kebutuhan perjalanan Anda, tim kami akan membantu mengecek opsi yang tersedia.</p>
+          </div>
+          <div class="flex items-center justify-center">
+            <AppButton :href="waUrl" variant="gold" size="lg" external class="mt-7 sm:mt-0">Konsultasikan Kebutuhan</AppButton>
+          </div>
+        </div>
       </Container>
     </section>
-
-    <section class="bg-sht-stone/25 py-14 sm:py-16"><Container><div class="rounded-3xl bg-sht-olive px-6 py-10 text-center sm:px-10 sm:py-12"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-gold">BUTUH BANTUAN LAIN?</p><h2 class="mx-auto mt-3 max-w-2xl font-heading text-2xl font-semibold text-sht-off-white sm:text-3xl">Belum Menemukan yang Anda Butuhkan?</h2><p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-sht-off-white/75">Ceritakan kebutuhan perjalanan Anda, tim kami akan membantu mengecek opsi yang tersedia.</p><AppButton :href="waUrl" variant="gold" size="lg" external class="mt-7">Konsultasikan Kebutuhan</AppButton></div></Container></section>
 
     <div v-if="inquiryService" class="fixed inset-0 z-50 flex items-end justify-center bg-sht-olive-dark/55 p-4 sm:items-center" role="dialog" aria-modal="true" :aria-label="`Konsultasi ${inquiryTitle}`"><div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-sht-stone bg-sht-off-white p-6 shadow-2xl sm:p-8"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-sage">KONSULTASI LAYANAN</p><h3 class="mt-2 font-heading text-xl font-semibold text-sht-olive-dark">{{ inquiryTitle }}</h3><p class="mt-1 text-sm text-sht-charcoal/60">Tim kami akan menghubungi Anda — gratis, tanpa komitmen.</p></div><button type="button" class="rounded-full p-2 text-sht-charcoal/50 hover:bg-sht-stone/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sht-gold" aria-label="Tutup" @click="closeInquiry"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
       <div v-if="iDone" class="mt-6 text-center"><span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sht-gold/20 text-sht-olive"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg></span><p class="mt-3 font-heading text-lg font-semibold text-sht-olive-dark">Permintaan terkirim!</p><p class="mt-2 text-sm text-sht-charcoal/70">Konsultan kami akan menghubungi Anda. Untuk lebih cepat, lanjutkan via WhatsApp.</p><AppButton :href="iWaUrl" variant="gold" block external class="mt-5">Lanjut via WhatsApp</AppButton><button type="button" class="mt-3 min-h-[40px] w-full rounded-full px-4 text-sm font-semibold text-sht-charcoal/60 hover:text-sht-olive" @click="closeInquiry">Tutup</button></div>
