@@ -2,6 +2,7 @@
 const route = useRoute()
 const isOpen = ref(false)
 const isScrolled = ref(false)
+const isHome = computed(() => route.path === '/')
 
 function updateScrollState() {
   isScrolled.value = window.scrollY > 24
@@ -37,16 +38,19 @@ watch(
 
 <template>
   <header
-    class="sticky top-4 z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-2xl border text-white backdrop-blur-md transition-[background-color,box-shadow,border-color] duration-300"
-    :class="isScrolled ? 'border-sht-gold/20 bg-sht-olive/95 shadow-lg shadow-sht-olive-dark/10' : 'border-white/15 bg-sht-olive/90'"
+    class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-full border backdrop-blur-md transition-[background-color,box-shadow,border-color] duration-300"
+    :class="[
+      isHome ? 'fixed left-1/2 top-4 -translate-x-1/2' : 'sticky top-4',
+      isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/90',
+    ]"
   >
     <Container>
-      <div class="flex h-16 items-center justify-between sm:h-[72px]">
+      <div class="flex h-14 items-center justify-between sm:h-16">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-2.5" aria-label="Sudut Haramain Tour — Beranda">
           <img src="/favicon.svg" alt="" class="h-9 w-9" />
           <span class="leading-tight">
-            <span class="block font-heading text-base font-semibold text-white sm:text-lg">Sudut Haramain</span>
+            <span class="block font-heading text-base font-semibold text-sht-olive-dark sm:text-lg">Sudut Haramain</span>
             <span class="block text-[10px] font-medium uppercase tracking-[0.24em] text-sht-gold">Tour</span>
           </span>
         </NuxtLink>
@@ -57,22 +61,22 @@ watch(
             v-for="item in navItems"
             :key="item.to"
             :to="item.to"
-            class="text-sm font-medium text-white/75 transition-colors hover:text-white"
-            :class="{ 'text-white': route.path.startsWith(item.to) }"
+            class="text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark"
+            :class="{ 'text-sht-olive-dark': route.path.startsWith(item.to) }"
           >
             {{ item.label }}
           </NuxtLink>
         </nav>
 
         <div class="hidden items-center gap-3 lg:flex">
-          <AppButton :href="waUrl" variant="ghost" size="sm" external class="text-white hover:bg-white/10 hover:text-white"> WhatsApp </AppButton>
+          <AppButton :href="waUrl" variant="ghost" size="sm" external class="text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark"> WhatsApp </AppButton>
           <AppButton to="/estimator" variant="gold" size="sm"> Hitung Estimasi </AppButton>
         </div>
 
         <!-- Mobile hamburger -->
         <button
           type="button"
-          class="inline-flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/10 lg:hidden"
+          class="inline-flex h-11 w-11 items-center justify-center rounded-full text-sht-olive-dark hover:bg-sht-olive/5 lg:hidden"
           :aria-expanded="isOpen"
           aria-controls="mobile-menu"
           aria-label="Buka menu navigasi"
@@ -89,14 +93,14 @@ watch(
     </Container>
 
     <!-- Mobile menu -->
-    <div v-show="isOpen" id="mobile-menu" class="border-t border-white/10 bg-sht-olive-dark/80 lg:hidden">
+    <div v-show="isOpen" id="mobile-menu" class="border-t border-sht-olive/10 bg-white/95 lg:hidden">
       <Container>
         <nav class="flex flex-col gap-1 py-4" aria-label="Navigasi seluler">
           <NuxtLink
             v-for="item in navItems"
             :key="item.to"
             :to="item.to"
-            class="rounded-xl px-4 py-3 text-base font-medium text-white/80 hover:bg-white/10 hover:text-white"
+            class="rounded-xl px-4 py-3 text-base font-medium text-sht-charcoal/80 hover:bg-sht-olive/5 hover:text-sht-olive-dark"
           >
             {{ item.label }}
           </NuxtLink>
