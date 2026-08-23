@@ -28,7 +28,7 @@ const testimonials = await fetchTestimonials()
     <AssistanceTabs />
 
     <!-- 5. TRUST / CERITA JAMAAH (preserved existing section) -->
-    <section class="py-14 sm:py-20">
+    <section class="bg-sht-off-white py-14 sm:py-20">
       <Container>
         <SectionHeader
           align="center"

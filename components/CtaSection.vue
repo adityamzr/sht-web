@@ -3,7 +3,7 @@ const waUrl = whatsappLink()
 </script>
 
 <template>
-  <section>
+  <section class="bg-sht-off-white">
     <Container>
       <div class="relative overflow-hidden rounded-3xl shadow-[0_16px_40px_-24px_rgba(45,53,31,0.55)]">
         <img
