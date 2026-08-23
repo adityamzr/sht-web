@@ -98,7 +98,18 @@ watch(
           <nav class="py-4" aria-label="Navigasi seluler">
             <p class="px-4 pb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Layanan</p>
             <div class="grid grid-cols-2 gap-1">
-              <NuxtLink v-for="item in serviceMenu" :key="item.label" :to="item.to" class="rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">{{ item.label }}</NuxtLink>
+              <NuxtLink v-for="item in serviceMenu" :key="item.label" :to="item.to" class="flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sht-gold/15 text-sht-olive" aria-hidden="true">
+                  <svg v-if="item.icon === 'visa'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h7l3 3V20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path stroke-linecap="round" d="M14 3.5V7h3M8.5 12h5"/></svg>
+                  <svg v-else-if="item.icon === 'badal'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M20 8.5c0 5-8 10-8 10s-8-5-8-10A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8 2.5Z"/></svg>
+                  <svg v-else-if="item.icon === 'hotel'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16m-12 0h16m-16 0v-4h4m8 0v-6h4"/></svg>
+                  <svg v-else-if="item.icon === 'flight'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 13.5-7.5-2.5 1.5-1.5L11 10l4.5-4.5a2.1 2.1 0 0 1 3 3L14 13l.5 6.5L13 21l-2.5-7.5Z"/></svg>
+                  <svg v-else-if="item.icon === 'transport'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M5 17h14M6.5 17l1.3-5.2A2 2 0 0 1 9.74 10.3h4.52a2 2 0 0 1 1.94 1.5L17.5 17m-10 0a2 2 0 1 0 4 0m2 0a2 2 0 1 0 4 0"/></svg>
+                  <svg v-else-if="item.icon === 'guide'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" d="M12 7v5l3.5 2"/></svg>
+                  <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l1 12H5L6 8Z"/><path stroke-linecap="round" d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                </span>
+                {{ item.label }}
+              </NuxtLink>
             </div>
             <NuxtLink to="/guides" class="mt-2 block rounded-xl px-3 py-3 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">Panduan</NuxtLink>
             <div class="mt-3 flex flex-col gap-2 px-1 pb-2"><AppButton to="/estimator" variant="gold" block>Hitung Estimasi Umroh</AppButton><AppButton :href="waUrl" variant="ghost" block external class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark">Konsultasi via WhatsApp</AppButton></div>
