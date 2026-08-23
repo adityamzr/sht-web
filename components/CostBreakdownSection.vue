@@ -84,8 +84,8 @@ function formatIdr(amount: number) {
 
 <template>
   <section class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="cost-heading">
-    <Container>
-      <div class="mx-auto max-w-3xl text-center">
+    <div class="mx-auto w-full max-w-[1280px] px-5 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-4xl text-center">
         <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
           <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
           GAMBARAN BIAYA
@@ -94,12 +94,12 @@ function formatIdr(amount: number) {
         <h2 id="cost-heading" class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
           Kenali Komponen Biaya Umroh Mandiri.
         </h2>
-        <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75">
+        <p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-sht-charcoal/75">
           Setiap pilihan perjalanan memengaruhi biaya. Lihat bagaimana komponennya terbentuk dalam satu simulasi.
         </p>
       </div>
 
-      <div class="mx-auto mt-12 max-w-4xl rounded-3xl border border-sht-stone bg-white p-5 shadow-[0_12px_40px_-24px_rgba(45,53,31,0.3)] sm:p-8 lg:p-10">
+      <div class="mx-auto mt-12 max-w-6xl rounded-3xl border border-sht-stone bg-white p-5 shadow-[0_12px_40px_-24px_rgba(45,53,31,0.3)] sm:p-8 lg:p-10">
         <div class="flex flex-col gap-6 border-b border-sht-stone pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sht-sage">SIMULASI PERJALANAN</p>
@@ -132,13 +132,13 @@ function formatIdr(amount: number) {
         </p>
 
         <div class="mt-6">
-          <div class="mb-3 hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_auto] gap-4 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sht-sage sm:grid">
+          <div class="mb-3 hidden grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)_minmax(9rem,0.65fr)] gap-4 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sht-sage sm:grid">
             <span>Komponen</span>
             <span>Catatan</span>
             <span class="text-right">Estimasi</span>
           </div>
           <TransitionGroup name="cost-row" tag="div" class="divide-y divide-sht-stone/80">
-            <div v-for="row in costRows" :key="`${activeSeason}-${row.number}`" class="grid gap-x-4 gap-y-1 py-4 first:pt-2 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_auto] sm:items-center">
+            <div v-for="row in costRows" :key="`${activeSeason}-${row.number}`" class="grid gap-x-4 gap-y-1 py-4 first:pt-2 sm:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)_minmax(9rem,0.65fr)] sm:items-center">
               <div class="min-w-0">
                 <div class="flex items-baseline gap-2.5">
                   <span class="text-xs font-semibold tracking-[0.12em] text-sht-sage">{{ row.number }}</span>
@@ -184,7 +184,7 @@ function formatIdr(amount: number) {
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" /></svg>
         </NuxtLink>
       </div>
-    </Container>
+    </div>
   </section>
 </template>
 
