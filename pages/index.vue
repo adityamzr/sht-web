@@ -43,6 +43,16 @@ const testimonials = await fetchTestimonials()
         <div class="mt-12 grid gap-5 md:grid-cols-3">
           <TestimonialCard v-for="t in testimonials" :key="t.id" :testimonial="t" />
         </div>
+        <div class="mx-auto mt-8 text-center">
+        <p class="text-sm text-sht-charcoal/70">Ingin tahu cerita jamaah lainnya?</p>
+        <NuxtLink
+          to="/estimator"
+          class="mt-4 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-sht-olive px-7 py-3.5 text-base font-semibold text-sht-off-white shadow-card transition-colors hover:bg-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold"
+        >
+          Lihat Lebih Banyak
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" /></svg>
+        </NuxtLink>
+      </div>
       </Container>
     </section>
 

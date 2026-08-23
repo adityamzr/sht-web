@@ -61,7 +61,7 @@ const selectedTab = computed(() => tabs[activeTab.value])
       </div>
 
       <div class="mx-auto mt-10 max-w-5xl">
-        <div class="overflow-x-auto rounded-2xl bg-sht-off-white p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Pilihan tingkat bantuan">
+        <div class="overflow-x-auto rounded-2xl bg-white p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Pilihan tingkat bantuan">
           <div class="flex min-w-max sm:min-w-0 sm:grid sm:grid-cols-3">
             <button
               v-for="(tab, index) in tabs"

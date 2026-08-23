@@ -101,9 +101,9 @@ function formatIdr(amount: number) {
 
       <div class="mx-auto mt-12 max-w-6xl rounded-3xl border border-sht-stone bg-white p-5 shadow-[0_12px_40px_-24px_rgba(45,53,31,0.3)] sm:p-8 lg:p-10">
         <div class="flex flex-col gap-6 border-b border-sht-stone pb-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+          <div class="text-center sm:text-start">
             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sht-sage">SIMULASI PERJALANAN</p>
-            <div class="mt-3 flex items-center gap-3 whitespace-nowrap text-sm font-medium text-sht-charcoal/75">
+            <div class="mt-3 flex justify-center sm:justify-start items-center gap-3 whitespace-nowrap text-sm font-medium text-sht-charcoal/75">
               <span>4 Jamaah</span>
               <div class="w-1.5 h-1.5 rounded-full bg-sht-charcoal/50"></div>
               <span>9 Hari</span>
@@ -112,7 +112,7 @@ function formatIdr(amount: number) {
             </div>
           </div>
 
-          <div class="inline-flex self-start rounded-full bg-sht-off-white p-1 sm:self-auto" aria-label="Pilih periode simulasi">
+          <div class="inline-flex self-center sm:self-start rounded-full bg-sht-off-white p-1" aria-label="Pilih periode simulasi">
             <button
               v-for="(season, key) in simulation"
               :key="key"
