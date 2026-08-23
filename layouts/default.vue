@@ -6,7 +6,7 @@ const showWhatsAppFloat = computed(() => !route.path.startsWith('/estimator'))
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col">
+  <div class="flex min-h-screen flex-col bg-sht-off-white">
     <SiteHeader />
     <main class="flex-1">
       <slot />
