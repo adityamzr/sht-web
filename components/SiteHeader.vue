@@ -133,7 +133,7 @@ watch(
             <div class="mt-2 space-y-1 border-t border-sht-stone/70 pt-2">
               <p class="mt-2 px-4 pb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Jelajahi</p>
               <NuxtLink v-for="item in navItems" :key="item.label" :to="item.to" class="flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-sht-charcoal/80 hover:bg-sht-off-white hover:text-sht-olive-dark">
-                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sht-gold/15 text-sht-olive" aria-hidden="true">
+                <span class="flex h-5 w-5 shrink-0 items-center justify-center text-sht-olive" aria-hidden="true">
                   <svg v-if="item.icon === 'guide'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 5.5A2.5 2.5 0 0 1 7 3h4.5v16H7a2.5 2.5 0 0 0-2.5 2.5v-16Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.5A2.5 2.5 0 0 0 17 3h-4.5v16H17a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
                   <svg v-else-if="item.icon === 'article'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="M6.5 3.5h8l3 3v14h-11a1.5 1.5 0 0 1-1.5-1.5V5a1.5 1.5 0 0 1 1.5-1.5Z"/><path stroke-linecap="round" d="M9 11h6M9 14h6M9 17h4M14.5 3.5V7h3"/></svg>
                   <svg v-else-if="item.icon === 'stories'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="2.5"/><circle cx="16.5" cy="9" r="2"/><path stroke-linecap="round" d="M4.5 18a4.5 4.5 0 0 1 9 0M14 17a3.5 3.5 0 0 1 6 1"/></svg>
