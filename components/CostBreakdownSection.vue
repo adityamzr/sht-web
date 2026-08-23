@@ -1,123 +1,190 @@
 <script setup lang="ts">
-interface CostComponent {
-  number: string
-  name: string
-  description: string
-  tag: string
-  icon: 'flight' | 'hotel' | 'transport' | 'visa' | 'support'
+type Season = 'lowSeason' | 'highSeason'
+
+type SimulationCosts = {
+  flight: number
+  makkahHotel: number
+  madinahHotel: number
+  transportation: number
+  visa: number
+  supportingServices: number
 }
 
-const components: CostComponent[] = [
-  {
-    number: '01',
-    name: 'Penerbangan',
-    description: 'Biaya penerbangan dapat berbeda berdasarkan jadwal keberangkatan, maskapai, rute, dan waktu pemesanan.',
-    tag: 'Variabel',
-    icon: 'flight',
+const simulation = {
+  lowSeason: {
+    label: 'Low Season',
+    explanation: 'Periode perjalanan dengan permintaan relatif lebih rendah.',
+    costs: {
+      flight: 28_000_000,
+      makkahHotel: 12_500_000,
+      madinahHotel: 5_400_000,
+      transportation: 4_800_000,
+      visa: 12_000_000,
+      supportingServices: 4_000_000,
+    },
   },
-  {
-    number: '02',
-    name: 'Hotel',
-    description: 'Biaya hotel menyesuaikan lokasi, jumlah malam, tipe kamar, serta periode perjalanan.',
-    tag: 'Variabel',
-    icon: 'hotel',
+  highSeason: {
+    label: 'High Season',
+    explanation: 'Periode dengan permintaan lebih tinggi seperti masa liburan atau periode ramai tertentu.',
+    costs: {
+      flight: 36_000_000,
+      makkahHotel: 18_000_000,
+      madinahHotel: 7_200_000,
+      transportation: 5_200_000,
+      visa: 12_800_000,
+      supportingServices: 4_500_000,
+    },
   },
-  {
-    number: '03',
-    name: 'Transportasi',
-    description: 'Biaya transportasi bergantung pada rute, kapasitas kendaraan, jumlah perjalanan, dan kebutuhan transfer selama perjalanan.',
-    tag: 'Variabel',
-    icon: 'transport',
-  },
-  {
-    number: '04',
-    name: 'Visa',
-    description: 'Biaya visa mengikuti jenis layanan pengurusan dan kebutuhan dokumen perjalanan yang dipilih.',
-    tag: 'Variabel',
-    icon: 'visa',
-  },
-  {
-    number: '05',
-    name: 'Layanan Pendukung',
-    description: 'Muthawwif, handling, perlengkapan, ziarah, dan layanan tambahan lainnya dapat disesuaikan dengan kebutuhan perjalanan.',
-    tag: 'Sesuai kebutuhan',
-    icon: 'support',
-  },
-]
+} satisfies Record<Season, { label: string; explanation: string; costs: SimulationCosts }>
+
+const activeSeason = ref<Season>('lowSeason')
+const currentSimulation = computed(() => simulation[activeSeason.value])
+const total = computed(() => Object.values(currentSimulation.value.costs).reduce((sum, amount) => sum + amount, 0))
+const perJamaah = computed(() => total.value / 4)
+
+const costRows = computed(() => [
+  { number: '01', label: 'Penerbangan', amount: currentSimulation.value.costs.flight },
+  { number: '02', label: 'Hotel Makkah', amount: currentSimulation.value.costs.makkahHotel },
+  { number: '03', label: 'Hotel Madinah', amount: currentSimulation.value.costs.madinahHotel },
+  { number: '04', label: 'Transportasi', amount: currentSimulation.value.costs.transportation },
+  { number: '05', label: 'Visa', amount: currentSimulation.value.costs.visa },
+  { number: '06', label: 'Layanan Pendukung', amount: currentSimulation.value.costs.supportingServices },
+])
+
+function formatIdr(amount: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount)
+}
 </script>
 
 <template>
-  <section class="bg-sht-stone/35 py-16 sm:py-20 lg:py-24" aria-labelledby="cost-heading">
+  <section class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="cost-heading">
     <Container>
-      <div class="grid items-start gap-12 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:gap-20">
-        <div class="lg:sticky lg:top-28">
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
-            <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
-            GAMBARAN BIAYA
-          </p>
-          <h2 id="cost-heading" class="mt-4 max-w-xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
-            Kenali Komponen Biaya Umroh Mandiri.
-          </h2>
-          <p class="mt-5 max-w-xl text-base leading-relaxed text-sht-charcoal/75">
-            Biaya perjalanan dapat berbeda sesuai waktu keberangkatan, penerbangan, hotel, transportasi, visa, dan layanan tambahan yang dipilih.
-          </p>
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+          <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+          GAMBARAN BIAYA
+          <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+        </p>
+        <h2 id="cost-heading" class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
+          Kenali Komponen Biaya Umroh Mandiri.
+        </h2>
+        <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75">
+          Setiap pilihan perjalanan memengaruhi biaya. Lihat bagaimana komponennya terbentuk dalam satu simulasi.
+        </p>
+      </div>
 
-          <div class="mt-8 border-l-2 border-sht-gold/60 pl-4">
-            <p class="text-sm leading-relaxed text-sht-charcoal/75">
-              Tidak ada satu biaya yang sama untuk setiap perjalanan. Estimasi mengikuti pilihan dan kebutuhan Anda.
-            </p>
+      <div class="mx-auto mt-12 max-w-4xl rounded-3xl border border-sht-stone bg-white p-5 shadow-[0_12px_40px_-24px_rgba(45,53,31,0.3)] sm:p-8 lg:p-10">
+        <div class="flex flex-col gap-6 border-b border-sht-stone pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sht-sage">SIMULASI PERJALANAN</p>
+            <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-sht-charcoal/75">
+              <span>4 Jamaah</span>
+              <span class="text-sht-stone" aria-hidden="true">·</span>
+              <span>9 Hari</span>
+              <span class="text-sht-stone" aria-hidden="true">·</span>
+              <span>Jakarta</span>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm text-sht-charcoal/60">
+              <span>5 malam Makkah</span>
+              <span>3 malam Madinah</span>
+            </div>
           </div>
 
-          <div class="mt-10">
-            <h3 class="font-heading text-xl font-semibold text-sht-olive-dark">Ingin tahu estimasi berdasarkan rencana Anda?</h3>
-            <p class="mt-3 max-w-lg text-sm leading-relaxed text-sht-charcoal/70">
-              Susun waktu perjalanan, jumlah jamaah, hotel, penerbangan, dan kebutuhan lainnya untuk melihat perkiraan biaya yang lebih sesuai.
-            </p>
-            <NuxtLink
-              to="/estimator"
-              class="mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-sht-olive px-7 py-3.5 text-base font-semibold text-sht-off-white shadow-card transition-colors hover:bg-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold"
+          <div class="inline-flex self-start rounded-full bg-sht-off-white p-1 sm:self-auto" aria-label="Pilih periode simulasi">
+            <button
+              v-for="(season, key) in simulation"
+              :key="key"
+              type="button"
+              class="min-h-[40px] rounded-full px-4 text-xs font-semibold uppercase tracking-[0.08em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold sm:px-5"
+              :class="activeSeason === key ? 'bg-sht-olive text-sht-off-white shadow-sm' : 'text-sht-charcoal/60 hover:text-sht-olive-dark'"
+              :aria-pressed="activeSeason === key"
+              @click="activeSeason = key"
             >
-              Hitung Estimasi Perjalanan
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" /></svg>
-            </NuxtLink>
+              {{ season.label }}
+            </button>
           </div>
         </div>
 
-        <div class="relative">
-          <div class="absolute bottom-20 left-6 top-6 w-px bg-sht-sage/30" aria-hidden="true" />
-          <ol class="relative space-y-3" aria-label="Komponen biaya Umroh Mandiri">
-            <li v-for="item in components" :key="item.number" class="relative flex gap-4 rounded-2xl border border-sht-stone/80 bg-sht-off-white/80 p-4 transition-colors hover:border-sht-gold/60 sm:gap-5 sm:p-5">
-              <div class="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-sht-gold/40 bg-sht-off-white text-sht-olive" aria-hidden="true">
-                <svg v-if="item.icon === 'flight'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 13.5-7.5-2.5 1.5-1.5L11 10l4.5-4.5a2.1 2.1 0 0 1 3 3L14 13l.5 6.5L13 21l-2.5-7.5Z" /></svg>
-                <svg v-else-if="item.icon === 'hotel'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16m-12 0h16m-16 0v-4h4m8 0v-6h4a2 2 0 0 1 2 2v8M8.5 7h1m3 0h1m-5 4h1m3 0h1" /></svg>
-                <svg v-else-if="item.icon === 'transport'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M5 17h14M6.5 17l1.3-5.2A2 2 0 0 1 9.74 10.3h4.52a2 2 0 0 1 1.94 1.5L17.5 17m-10 0a2 2 0 1 0 4 0m2 0a2 2 0 1 0 4 0M7 13.5h10" /></svg>
-                <svg v-else-if="item.icon === 'visa'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h7l3 3V20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z" /><path stroke-linecap="round" d="M14 3.5V7h3M8.5 12h5M8.5 15h3" /></svg>
-                <svg v-else class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linejoin="round" d="m7 7 5-3 5 3v7l-5 3-5-3V7Z" /><path stroke-linecap="round" d="m7 7 5 3 5-3M12 10v7M5 18.5l7 3 7-3" /></svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-start justify-between gap-2">
-                  <div class="flex items-baseline gap-2.5">
-                    <span class="font-heading text-xs font-semibold tracking-[0.15em] text-sht-sage">{{ item.number }}</span>
-                    <h3 class="font-heading text-lg font-semibold text-sht-olive-dark sm:text-xl">{{ item.name }}</h3>
-                  </div>
-                  <span class="shrink-0 rounded-full bg-sht-gold/15 px-2.5 py-1 text-[11px] font-semibold text-sht-olive-dark">{{ item.tag }}</span>
-                </div>
-                <p class="mt-2 text-sm leading-relaxed text-sht-charcoal/70">{{ item.description }}</p>
-              </div>
-            </li>
-          </ol>
+        <p class="mt-5 text-sm text-sht-charcoal/60" aria-live="polite">
+          {{ currentSimulation.explanation }}
+        </p>
 
-          <div class="relative mt-5 flex items-center gap-4 rounded-2xl bg-sht-olive px-5 py-5 text-sht-off-white sm:px-6">
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sht-gold text-sht-olive-dark" aria-hidden="true">
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </span>
+        <div class="mt-6">
+          <div class="mb-3 hidden grid-cols-[1fr_auto] px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sht-sage sm:grid">
+            <span>Komponen perjalanan</span>
+            <span>Perkiraan biaya</span>
+          </div>
+          <TransitionGroup name="cost-row" tag="div" class="divide-y divide-sht-stone/80">
+            <div v-for="row in costRows" :key="`${activeSeason}-${row.number}`" class="grid grid-cols-[1fr_auto] items-center gap-4 py-4 first:pt-2">
+              <div class="flex min-w-0 items-center gap-3">
+                <span class="text-xs font-semibold tracking-[0.12em] text-sht-sage">{{ row.number }}</span>
+                <span class="truncate text-sm font-medium text-sht-charcoal sm:text-base">{{ row.label }}</span>
+              </div>
+              <span class="text-right text-sm font-semibold tabular-nums text-sht-olive-dark sm:text-base">{{ formatIdr(row.amount) }}</span>
+            </div>
+          </TransitionGroup>
+        </div>
+
+        <div class="mt-4 border-t-2 border-sht-olive/15 pt-6">
+          <div class="flex items-end justify-between gap-4">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-gold">Hasil akhirnya</p>
-              <p class="mt-1 font-heading text-lg font-semibold">Estimasi sesuai rencana Anda</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-sage">Estimasi Total</p>
+              <Transition name="amount" mode="out-in">
+                <p :key="total" class="mt-2 font-heading text-2xl font-semibold tabular-nums text-sht-olive-dark sm:text-4xl">{{ formatIdr(total) }}</p>
+              </Transition>
+            </div>
+            <div class="text-right">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-sht-sage">Per Jamaah</p>
+              <Transition name="amount" mode="out-in">
+                <p :key="perJamaah" class="mt-2 text-base font-semibold tabular-nums text-sht-olive-dark sm:text-xl">± {{ formatIdr(perJamaah) }}</p>
+              </Transition>
             </div>
           </div>
         </div>
+
+        <p class="mt-6 border-t border-sht-stone/70 pt-5 text-xs leading-relaxed text-sht-charcoal/60">
+          Simulasi ini digunakan sebagai gambaran biaya, bukan harga penawaran. Estimasi aktual dapat berubah mengikuti tanggal keberangkatan, ketersediaan, pilihan hotel dan penerbangan, kurs, jumlah jamaah, serta layanan yang dipilih.
+        </p>
+      </div>
+
+      <div class="mx-auto mt-8 text-center">
+        <p class="text-sm text-sht-charcoal/70">Ingin menghitung sesuai rencana Anda?</p>
+        <NuxtLink
+          to="/estimator"
+          class="mt-4 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-sht-olive px-7 py-3.5 text-base font-semibold text-sht-off-white shadow-card transition-colors hover:bg-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold"
+        >
+          Hitung Estimasi Saya
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-6-6m6 6-6 6" /></svg>
+        </NuxtLink>
       </div>
     </Container>
   </section>
 </template>
+
+<style scoped>
+.cost-row-move,
+.cost-row-enter-active,
+.cost-row-leave-active,
+.amount-enter-active,
+.amount-leave-active {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.cost-row-enter-from,
+.cost-row-leave-to,
+.amount-enter-from,
+.amount-leave-to {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cost-row-move,
+  .cost-row-enter-active,
+  .cost-row-leave-active,
+  .amount-enter-active,
+  .amount-leave-active {
+    transition: none;
+  }
+}
+</style>
