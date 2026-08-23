@@ -13,9 +13,11 @@ defineProps<{
     <p
       v-if="eyebrow"
       class="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
-      :class="dark ? 'text-gold-soft' : 'text-brand-teal'"
+      :class="dark ? 'text-gold-soft' : 'text-sht-gold'"
     >
-      {{ eyebrow }}
+      <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+        {{ eyebrow }}
+      <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
     </p>
     <h2
       class="font-heading text-3xl sm:text-4xl font-semibold text-balance"

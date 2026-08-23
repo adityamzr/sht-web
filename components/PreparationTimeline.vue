@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
       <!-- Desktop: anchored context + page-scrolling timeline -->
       <div class="hidden md:grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-start md:gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
         <div class="md:sticky md:top-24">
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
             <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
             PERSIAPAN UMROH MANDIRI
           </p>
@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
       <!-- Mobile: single-column page-scrolling storytelling -->
       <div class="md:hidden">
         <div>
-          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+          <p class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
             <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
             PERSIAPAN UMROH MANDIRI
           </p>

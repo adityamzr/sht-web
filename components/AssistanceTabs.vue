@@ -47,7 +47,7 @@ const selectedTab = computed(() => tabs[activeTab.value])
   <section class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="assistance-heading">
     <Container>
       <div class="mx-auto max-w-3xl text-center">
-        <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+        <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
           <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
           BANTUAN SESUAI KEBUTUHAN
           <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />

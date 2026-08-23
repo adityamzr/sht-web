@@ -86,7 +86,7 @@ function formatIdr(amount: number) {
   <section class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="cost-heading">
     <div class="mx-auto w-full max-w-[1280px] px-5 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-4xl text-center">
-        <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+        <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-gold">
           <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
           GAMBARAN BIAYA
           <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
