@@ -94,29 +94,6 @@ const serviceCards = [
     <!-- 4. BANTUAN SESUAI KEBUTUHAN (M4A.4 — assistance tabs) -->
     <AssistanceTabs />
 
-    <!-- 5. VALUE PROPOSITION -->
-    <section class="py-14 sm:py-20">
-      <Container>
-        <SectionHeader
-          align="center"
-          eyebrow="Kenapa Umroh Private"
-          title="Umroh yang tenang, atas nama keluarga Anda"
-          subtitle="Kami percaya ibadah terbaik lahir dari ketenangan. Karena itu Sudut Haramain membantu Anda berumroh dengan cara yang paling sesuai — bukan sebaliknya."
-        />
-        <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div
-            v-for="point in whyPoints"
-            :key="point.title"
-            class="rounded-card border border-neutral-line bg-white p-6 shadow-card"
-          >
-            <span class="block h-1 w-10 rounded-full bg-gold" aria-hidden="true" />
-            <h3 class="mt-4 font-heading text-lg font-semibold">{{ point.title }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">{{ point.text }}</p>
-          </div>
-        </div>
-      </Container>
-    </section>
-
     <!-- 3. SERVICES OVERVIEW -->
     <section class="bg-neutral-warm py-14 sm:py-20">
       <Container>
@@ -155,24 +132,6 @@ const serviceCards = [
 
     <!-- 4. ESTIMATOR TEASER -->
     <EstimatorTeaser />
-
-    <!-- 5. HOW IT WORKS -->
-    <section class="py-14 sm:py-20">
-      <Container>
-        <SectionHeader
-          align="center"
-          eyebrow="Cara Kerjanya"
-          title="Empat langkah menuju Baitullah"
-        />
-        <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div v-for="step in howSteps" :key="step.num" class="relative rounded-card border border-neutral-line bg-white p-6 shadow-card">
-            <span class="font-heading text-3xl font-semibold text-brand-sky" aria-hidden="true">{{ step.num }}</span>
-            <h3 class="mt-3 font-heading text-lg font-semibold">{{ step.title }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-neutral-charcoal/70">{{ step.text }}</p>
-          </div>
-        </div>
-      </Container>
-    </section>
 
     <!-- 6. HOTEL / TRAVEL EXPERIENCE TEASER -->
     <section class="bg-neutral-warm py-14 sm:py-20">

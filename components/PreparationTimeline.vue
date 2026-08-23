@@ -259,7 +259,7 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Existing closing callout preserved -->
-      <div class="mt-16 border-t border-sht-stone pt-12 text-center">
+      <!-- <div class="mt-16 border-t border-sht-stone pt-12 text-center">
         <h3 class="font-heading text-2xl font-semibold text-sht-olive-dark text-balance sm:text-3xl">
           {{ closing.heading }}
         </h3>
@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
             {{ closing.cta }}
           </NuxtLink>
         </div>
-      </div>
+      </div> -->
     </Container>
   </section>
 </template>
