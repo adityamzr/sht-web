@@ -30,11 +30,16 @@ const testimonials = await fetchTestimonials()
     <!-- 5. TRUST / CERITA JAMAAH (preserved existing section) -->
     <section class="bg-sht-off-white py-14 sm:py-20">
       <Container>
-        <SectionHeader
-          align="center"
-          eyebrow="Cerita Jamaah"
-          title="Mereka sudah berangkat dengan cara mereka"
-        />
+        <div class="mx-auto max-w-3xl text-center">
+          <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
+            <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+            CERITA JAMAAH
+            <span class="h-px w-8 bg-sht-gold" aria-hidden="true" />
+          </p>
+          <h2 class="mt-4 font-heading text-3xl font-semibold leading-tight text-sht-olive-dark text-balance sm:text-4xl">
+            Mereka sudah berangkat dengan cara mereka
+          </h2>
+        </div>
         <div class="mt-12 grid gap-5 md:grid-cols-3">
           <TestimonialCard v-for="t in testimonials" :key="t.id" :testimonial="t" />
         </div>

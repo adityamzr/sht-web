@@ -19,11 +19,11 @@ const props = withDefaults(
 )
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green active:scale-[0.98]'
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold active:scale-[0.98]'
 
 const variants: Record<Variant, string> = {
   primary: 'bg-brand-green text-white hover:bg-[#0b3230] shadow-card',
-  gold: 'bg-gold text-neutral-charcoal hover:bg-[#c39f2e] shadow-card',
+  gold: 'bg-sht-gold text-sht-olive-dark hover:bg-[#c7b55e] shadow-card',
   outline:
     'border border-brand-green/30 text-brand-green hover:border-brand-green hover:bg-brand-green/5',
   whatsapp: 'bg-[#25D366] text-white hover:bg-[#1fb857] shadow-card',

@@ -8,7 +8,7 @@ const waUrl = whatsappLink()
     target="_blank"
     rel="noopener noreferrer"
     aria-label="Chat WhatsApp Sudut Haramain Tour"
-    class="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-card-hover transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green"
+    class="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-sht-olive text-sht-gold shadow-card-hover transition-colors transition-transform hover:bg-sht-olive-dark hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold"
   >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-7 w-7" aria-hidden="true">
       <path

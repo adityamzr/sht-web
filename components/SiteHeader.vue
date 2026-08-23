@@ -114,7 +114,15 @@ watch(
           </NuxtLink>
           <div class="mt-3 flex flex-col gap-2 px-1 pb-2">
             <AppButton to="/estimator" variant="gold" block> Hitung Estimasi Umroh </AppButton>
-            <AppButton :href="waUrl" variant="whatsapp" block external> Konsultasi via WhatsApp </AppButton>
+            <AppButton
+              :href="waUrl"
+              variant="ghost"
+              block
+              external
+              class="border border-sht-olive/20 text-sht-olive-dark hover:bg-sht-olive/5 hover:text-sht-olive-dark"
+            >
+              Konsultasi via WhatsApp
+            </AppButton>
           </div>
         </nav>
       </Container>
