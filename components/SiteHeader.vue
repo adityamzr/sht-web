@@ -38,7 +38,7 @@ watch(
 
 <template>
   <header
-    class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-full border backdrop-blur-md transition-[background-color,box-shadow,border-color] duration-300"
+    class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] overflow-hidden rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
     :class="[
       isHome ? 'fixed left-1/2 top-4 -translate-x-1/2' : 'sticky top-4',
       isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/90',
@@ -92,8 +92,16 @@ watch(
       </div>
     </Container>
 
-    <!-- Mobile menu -->
-    <div v-show="isOpen" id="mobile-menu" class="border-t border-sht-olive/10 bg-white/95 lg:hidden">
+    <!-- Mobile menu: soft height/opacity transition, tanpa scroll-jacking -->
+    <Transition
+      enter-active-class="transition-[max-height,opacity] duration-300 ease-out"
+      enter-from-class="max-h-0 opacity-0"
+      enter-to-class="max-h-96 opacity-100"
+      leave-active-class="transition-[max-height,opacity] duration-250 ease-in"
+      leave-from-class="max-h-96 opacity-100"
+      leave-to-class="max-h-0 opacity-0"
+    >
+      <div v-show="isOpen" id="mobile-menu" class="max-h-96 border-t border-sht-olive/10 bg-white/95 lg:hidden">
       <Container>
         <nav class="flex flex-col gap-1 py-4" aria-label="Navigasi seluler">
           <NuxtLink
@@ -110,6 +118,7 @@ watch(
           </div>
         </nav>
       </Container>
-    </div>
+      </div>
+    </Transition>
   </header>
 </template>
