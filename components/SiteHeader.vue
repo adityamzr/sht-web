@@ -3,6 +3,19 @@ const route = useRoute()
 const isOpen = ref(false)
 const isServicesOpen = ref(false)
 const isScrolled = ref(false)
+let serviceCloseTimer: ReturnType<typeof setTimeout> | null = null
+
+function openServicesMenu() {
+  if (serviceCloseTimer) clearTimeout(serviceCloseTimer)
+  isServicesOpen.value = true
+}
+
+function scheduleServicesClose() {
+  if (serviceCloseTimer) clearTimeout(serviceCloseTimer)
+  serviceCloseTimer = setTimeout(() => {
+    isServicesOpen.value = false
+  }, 160)
+}
 const isHome = computed(() => route.path === '/')
 
 function updateScrollState() {
@@ -18,13 +31,13 @@ onBeforeUnmount(() => window.removeEventListener('scroll', updateScrollState))
 
 const navItems = [{ label: 'Panduan', to: '/guides' }]
 const serviceMenu = [
-  { label: 'Visa Umroh', to: '/services/visa', icon: 'visa' },
-  { label: 'Badal Umroh', to: '/services', icon: 'badal' },
-  { label: 'Hotel', to: '/hotels', icon: 'hotel' },
-  { label: 'Penerbangan', to: '/flights', icon: 'flight' },
-  { label: 'Transportasi', to: '/transportation', icon: 'transport' },
-  { label: 'Muthawwif', to: '/services', icon: 'guide' },
-  { label: 'Handling', to: '/services', icon: 'handling' },
+  { label: 'Visa Umroh', subtitle: 'Pengurusan visa untuk perjalanan Umroh.', to: '/services/visa', icon: 'visa' },
+  { label: 'Badal Umroh', subtitle: 'Pelaksanaan Badal Umroh sesuai amanah keluarga.', to: '/services', icon: 'badal' },
+  { label: 'Hotel', subtitle: 'Akomodasi Makkah dan Madinah.', to: '/hotels', icon: 'hotel' },
+  { label: 'Penerbangan', subtitle: 'Pilihan penerbangan untuk perjalanan Umroh.', to: '/flights', icon: 'flight' },
+  { label: 'Transportasi', subtitle: 'Transfer bandara dan perjalanan selama di Saudi.', to: '/transportation', icon: 'transport' },
+  { label: 'Muthawwif', subtitle: 'Pendamping ibadah selama Umroh.', to: '/services', icon: 'guide' },
+  { label: 'Handling', subtitle: 'Bantuan kedatangan, bagasi, dan kebutuhan bandara.', to: '/services', icon: 'handling' },
 ]
 const waUrl = whatsappLink()
 
@@ -52,13 +65,13 @@ watch(
         </NuxtLink>
 
         <nav class="hidden items-center gap-7 lg:flex" aria-label="Navigasi utama">
-          <div class="relative">
-            <button type="button" class="inline-flex items-center gap-1.5 text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark" :aria-expanded="isServicesOpen" aria-controls="services-menu" @click="isServicesOpen = !isServicesOpen">
+          <div class="relative" @mouseenter="openServicesMenu" @mouseleave="scheduleServicesClose">
+            <button type="button" class="inline-flex items-center gap-1.5 text-sm font-medium text-sht-charcoal/70 transition-colors hover:text-sht-olive-dark" :aria-expanded="isServicesOpen" aria-controls="services-menu" @click="isServicesOpen = !isServicesOpen" @keydown.esc="isServicesOpen = false">
               Layanan
               <svg class="h-4 w-4 transition-transform duration-200" :class="isServicesOpen ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
             </button>
             <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="translate-y-1 opacity-0" enter-to-class="translate-y-0 opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
-              <div v-if="isServicesOpen" id="services-menu" class="absolute left-1/2 top-full mt-5 w-[520px] -translate-x-1/2 rounded-2xl border border-sht-stone bg-white p-4 shadow-xl shadow-sht-olive/10" role="menu" aria-label="Layanan Sudut Haramain">
+              <div v-if="isServicesOpen" id="services-menu" class="absolute left-1/2 top-full z-20 mt-2 w-[560px] -translate-x-1/2 rounded-2xl border border-sht-stone bg-white p-4 shadow-xl shadow-sht-olive/10 before:absolute before:-top-3 before:left-0 before:right-0 before:h-3" role="menu" aria-label="Layanan Sudut Haramain">
                 <div class="grid grid-cols-2 gap-1">
                   <NuxtLink v-for="item in serviceMenu" :key="item.label" :to="item.to" role="menuitem" class="group flex items-center gap-3 rounded-xl p-3 text-sm text-sht-charcoal/75 transition-colors hover:bg-sht-off-white hover:text-sht-olive-dark">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sht-gold/15 text-sht-olive" aria-hidden="true">
@@ -70,7 +83,7 @@ watch(
                       <svg v-else-if="item.icon === 'guide'" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" d="M12 7v5l3.5 2"/></svg>
                       <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l1 12H5L6 8Z"/><path stroke-linecap="round" d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
                     </span>
-                    <span>{{ item.label }}</span>
+                    <span class="min-w-0"><span class="block font-semibold text-sht-olive-dark">{{ item.label }}</span><span class="mt-0.5 block text-xs leading-snug text-sht-charcoal/55">{{ item.subtitle }}</span></span>
                   </NuxtLink>
                 </div>
                 <NuxtLink to="/services" role="menuitem" class="mt-3 block border-t border-sht-stone pt-3 text-center text-sm font-semibold text-sht-olive hover:text-sht-olive-dark">Lihat semua layanan →</NuxtLink>
