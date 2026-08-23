@@ -7,7 +7,6 @@ type SimulationCosts = {
   madinahHotel: number
   transportation: number
   visa: number
-  supportingServices: number
 }
 
 const simulation = {
@@ -20,7 +19,6 @@ const simulation = {
       madinahHotel: 5_400_000,
       transportation: 4_800_000,
       visa: 12_000_000,
-      supportingServices: 4_000_000,
     },
   },
   highSeason: {
@@ -32,7 +30,6 @@ const simulation = {
       madinahHotel: 7_200_000,
       transportation: 5_200_000,
       visa: 12_800_000,
-      supportingServices: 4_500_000,
     },
   },
 } satisfies Record<Season, { label: string; explanation: string; costs: SimulationCosts }>
@@ -43,12 +40,41 @@ const total = computed(() => Object.values(currentSimulation.value.costs).reduce
 const perJamaah = computed(() => total.value / 4)
 
 const costRows = computed(() => [
-  { number: '01', label: 'Penerbangan', amount: currentSimulation.value.costs.flight },
-  { number: '02', label: 'Hotel Makkah', amount: currentSimulation.value.costs.makkahHotel },
-  { number: '03', label: 'Hotel Madinah', amount: currentSimulation.value.costs.madinahHotel },
-  { number: '04', label: 'Transportasi', amount: currentSimulation.value.costs.transportation },
-  { number: '05', label: 'Visa', amount: currentSimulation.value.costs.visa },
-  { number: '06', label: 'Layanan Pendukung', amount: currentSimulation.value.costs.supportingServices },
+  {
+    number: '01',
+    label: 'Tiket Pesawat PP',
+    subtitle: 'Pulang-pergi untuk 4 jamaah',
+    note: 'Jadwal dan maskapai mengikuti asumsi musim perjalanan.',
+    amount: currentSimulation.value.costs.flight,
+  },
+  {
+    number: '02',
+    label: 'Hotel Makkah',
+    subtitle: '5 malam di Makkah',
+    note: 'Estimasi mengikuti periode perjalanan dan pilihan akomodasi.',
+    amount: currentSimulation.value.costs.makkahHotel,
+  },
+  {
+    number: '03',
+    label: 'Hotel Madinah',
+    subtitle: '3 malam di Madinah',
+    note: 'Estimasi mengikuti periode perjalanan dan pilihan akomodasi.',
+    amount: currentSimulation.value.costs.madinahHotel,
+  },
+  {
+    number: '04',
+    label: 'Transportasi',
+    subtitle: 'Kebutuhan perjalanan selama di Saudi',
+    note: 'Mencakup kebutuhan transfer dan perjalanan antar kota sesuai simulasi.',
+    amount: currentSimulation.value.costs.transportation,
+  },
+  {
+    number: '05',
+    label: 'Visa',
+    subtitle: 'Pengurusan untuk 4 jamaah',
+    note: 'Estimasi mengikuti layanan pengurusan visa yang digunakan.',
+    amount: currentSimulation.value.costs.visa,
+  },
 ])
 
 function formatIdr(amount: number) {
@@ -77,16 +103,12 @@ function formatIdr(amount: number) {
         <div class="flex flex-col gap-6 border-b border-sht-stone pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sht-sage">SIMULASI PERJALANAN</p>
-            <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-sht-charcoal/75">
+            <div class="mt-3 flex items-center gap-3 whitespace-nowrap text-sm font-medium text-sht-charcoal/75">
               <span>4 Jamaah</span>
               <span class="text-sht-stone" aria-hidden="true">·</span>
               <span>9 Hari</span>
               <span class="text-sht-stone" aria-hidden="true">·</span>
               <span>Jakarta</span>
-            </div>
-            <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm text-sht-charcoal/60">
-              <span>5 malam Makkah</span>
-              <span>3 malam Madinah</span>
             </div>
           </div>
 
@@ -110,16 +132,21 @@ function formatIdr(amount: number) {
         </p>
 
         <div class="mt-6">
-          <div class="mb-3 hidden grid-cols-[1fr_auto] px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sht-sage sm:grid">
-            <span>Komponen perjalanan</span>
-            <span>Perkiraan biaya</span>
+          <div class="mb-3 hidden grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_auto] gap-4 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sht-sage sm:grid">
+            <span>Komponen</span>
+            <span>Catatan</span>
+            <span class="text-right">Estimasi</span>
           </div>
           <TransitionGroup name="cost-row" tag="div" class="divide-y divide-sht-stone/80">
-            <div v-for="row in costRows" :key="`${activeSeason}-${row.number}`" class="grid grid-cols-[1fr_auto] items-center gap-4 py-4 first:pt-2">
-              <div class="flex min-w-0 items-center gap-3">
-                <span class="text-xs font-semibold tracking-[0.12em] text-sht-sage">{{ row.number }}</span>
-                <span class="truncate text-sm font-medium text-sht-charcoal sm:text-base">{{ row.label }}</span>
+            <div v-for="row in costRows" :key="`${activeSeason}-${row.number}`" class="grid gap-x-4 gap-y-1 py-4 first:pt-2 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_auto] sm:items-center">
+              <div class="min-w-0">
+                <div class="flex items-baseline gap-2.5">
+                  <span class="text-xs font-semibold tracking-[0.12em] text-sht-sage">{{ row.number }}</span>
+                  <span class="text-sm font-medium text-sht-charcoal sm:text-base">{{ row.label }}</span>
+                </div>
+                <p class="mt-1 pl-7 text-xs leading-relaxed text-sht-charcoal/60 sm:text-sm">{{ row.subtitle }}</p>
               </div>
+              <p class="pl-7 text-xs leading-relaxed text-sht-charcoal/60 sm:pl-0 sm:text-sm">{{ row.note }}</p>
               <span class="text-right text-sm font-semibold tabular-nums text-sht-olive-dark sm:text-base">{{ formatIdr(row.amount) }}</span>
             </div>
           </TransitionGroup>
