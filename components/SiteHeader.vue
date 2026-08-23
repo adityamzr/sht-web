@@ -52,7 +52,7 @@ watch(
 
 <template>
   <header
-    class="relative z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
+    class="z-50 mx-auto w-[calc(100%-1.5rem)] max-w-[1152px] rounded-2xl border backdrop-blur-md transition-[background-color,box-shadow,border-color,border-radius] duration-300 lg:rounded-full"
     :class="[
       isHome ? 'fixed left-1/2 top-4 -translate-x-1/2' : 'sticky top-4',
       isScrolled ? 'border-sht-olive/10 bg-white/95 shadow-lg shadow-sht-olive/10' : 'border-sht-olive/10 bg-white/80',
