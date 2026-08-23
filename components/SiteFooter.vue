@@ -30,11 +30,7 @@ const navGroups = [
         <!-- Brand -->
         <div class="md:col-span-2 lg:col-span-2">
           <div class="flex items-center gap-2.5">
-            <img src="/favicon.svg" alt="" class="h-10 w-10" />
-            <span class="leading-tight">
-              <span class="block font-heading text-lg font-semibold">Sudut Haramain</span>
-              <span class="block text-[10px] font-medium uppercase tracking-[0.24em] text-sht-gold">Tour</span>
-            </span>
+            <img src="/assets/images/sht_horizontal_white_logo.png" alt="" class="h-[80px] sm:h-[96px] w-auto" />
           </div>
           <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
             Sudut Haramain membantu Anda menyiapkan Umroh Mandiri dengan lebih terarah melalui layanan fleksibel,
