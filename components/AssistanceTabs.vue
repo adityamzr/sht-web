@@ -44,7 +44,7 @@ const selectedTab = computed(() => tabs[activeTab.value])
 </script>
 
 <template>
-  <section class="bg-white py-16 sm:py-20 lg:py-24" aria-labelledby="assistance-heading">
+  <section class="bg-sht-off-white py-16 sm:py-20 lg:py-24" aria-labelledby="assistance-heading">
     <Container>
       <div class="mx-auto max-w-3xl text-center">
         <p class="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-sht-olive-dark">
@@ -85,7 +85,7 @@ const selectedTab = computed(() => tabs[activeTab.value])
             :id="`assistance-panel-${activeTab}`"
             role="tabpanel"
             :aria-label="selectedTab.label"
-            class="mt-5 grid min-h-[300px] items-center gap-8 rounded-3xl border border-sht-stone/80 bg-sht-off-white/55 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-12"
+            class="mt-5 grid min-h-[300px] items-center gap-8 rounded-3xl border border-sht-stone/80 bg-white/90 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-12"
           >
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">{{ selectedTab.label }}</p>
