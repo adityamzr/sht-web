@@ -126,12 +126,6 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
           <p class="mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75 sm:text-lg">Temukan kebutuhan perjalanan dan pendampingan Umroh dalam satu tempat, lalu pilih layanan yang sesuai dengan rencana Anda.</p>
           <p class="mt-4 text-sm font-medium text-sht-olive">Anda tidak harus menggunakan semuanya sekaligus.</p>
         </div>
-      </Container>
-    </section>
-
-    <section class="py-14 sm:py-20">
-      <Container>
-        <div class="max-w-2xl"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">SEMUA LAYANAN</p><h2 class="mt-3 font-heading text-2xl font-semibold text-sht-olive-dark sm:text-3xl">Pilih kebutuhan Anda dalam satu tempat.</h2></div>
         <div v-if="pending" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><div v-for="n in 6" :key="n" class="h-56 animate-pulse rounded-2xl bg-sht-stone/60" aria-hidden="true" /></div>
         <div v-else-if="error" class="mt-10 rounded-2xl border border-sht-stone bg-white p-8 text-center"><p class="text-sm text-sht-charcoal/70">Kami kesulitan memuat layanan. Silakan coba lagi.</p><AppButton variant="gold" class="mt-4" @click="refresh">Coba Lagi</AppButton></div>
         <div v-else class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
