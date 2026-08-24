@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { serviceDirectory } from '~/data/services'
+
 const route = useRoute()
 const isOpen = ref(false)
 const isServicesOpen = ref(false)
@@ -36,15 +38,7 @@ const navItems = [
   { label: 'Cerita Jamaah', to: '/', icon: 'stories' },
   { label: 'FAQ', to: '/guides', icon: 'faq' },
 ]
-const serviceMenu = [
-  { label: 'Visa Umroh', subtitle: 'Pengurusan visa untuk perjalanan Umroh.', to: '/services/visa', icon: 'visa' },
-  { label: 'Badal Umroh', subtitle: 'Pelaksanaan Badal Umroh sesuai amanah keluarga.', to: '/services', icon: 'badal' },
-  { label: 'Hotel', subtitle: 'Akomodasi Makkah dan Madinah.', to: '/hotels', icon: 'hotel' },
-  { label: 'Penerbangan', subtitle: 'Pilihan penerbangan untuk perjalanan Umroh.', to: '/flights', icon: 'flight' },
-  { label: 'Transportasi', subtitle: 'Transfer bandara dan perjalanan selama di Saudi.', to: '/transportation', icon: 'transport' },
-  { label: 'Muthawwif', subtitle: 'Pendamping ibadah selama Umroh.', to: '/services', icon: 'guide' },
-  { label: 'Handling', subtitle: 'Bantuan kedatangan, bagasi, dan kebutuhan bandara.', to: '/services', icon: 'handling' },
-]
+const serviceMenu = serviceDirectory.map((item) => ({ ...item, label: item.name }))
 const waUrl = whatsappLink()
 
 watch(

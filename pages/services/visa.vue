@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { serviceDirectory } from '~/data/services'
+
 useSeoMeta({
   title: 'Layanan Visa Umroh — Sudut Haramain Tour',
   description: 'Siapkan kebutuhan visa Umroh dengan bantuan tim Sudut Haramain Tour.',
 })
 
-const { services, pending, error } = useServices()
-const visaService = computed(() => services.value.find((service) => service.code?.toLowerCase() === 'visa') ?? null)
+const visaService = serviceDirectory.find((service) => service.key === 'visa')!
 </script>
 
 <template>
@@ -27,17 +28,7 @@ const visaService = computed(() => services.value.find((service) => service.code
 
     <section class="py-14 sm:py-20">
       <Container>
-        <div v-if="pending" class="h-44 animate-pulse rounded-2xl bg-sht-stone/50" aria-hidden="true" />
-        <div v-else-if="error || !visaService" class="rounded-2xl border border-sht-stone bg-sht-off-white p-8">
-          <h2 class="font-heading text-2xl font-semibold text-sht-olive-dark">Visa Umroh</h2>
-          <p class="mt-3 max-w-xl text-sm leading-relaxed text-sht-charcoal/70">
-            Tim kami siap membantu mengonfirmasi ketersediaan dan kebutuhan visa untuk perjalanan Anda.
-          </p>
-          <NuxtLink to="/services" class="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-sht-olive px-6 py-3 text-sm font-semibold text-sht-off-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold">
-            Lihat layanan lainnya
-          </NuxtLink>
-        </div>
-        <article v-else class="max-w-2xl rounded-2xl border border-sht-stone bg-white p-6 sm:p-8">
+        <article class="max-w-2xl rounded-2xl border border-sht-stone bg-white p-6 sm:p-8">
           <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sht-sage">Layanan tersedia</p>
           <h2 class="mt-3 font-heading text-2xl font-semibold text-sht-olive-dark">{{ visaService.name }}</h2>
           <p class="mt-3 text-base leading-relaxed text-sht-charcoal/70">{{ visaService.description }}</p>

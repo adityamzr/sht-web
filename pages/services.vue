@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Service, ServiceInquiryResult } from '~/types'
+import { serviceDirectory, type PublicService } from '~/data/services'
 import { buildServiceInquiryMessage } from '~/utils/waMessage'
 
 useSeoMeta({
@@ -9,102 +9,41 @@ useSeoMeta({
   ogDescription: 'Pilih bantuan Umroh sesuai rencana dan kebutuhan perjalanan Anda.',
 })
 
-const { services, pending, error, refresh } = useServices()
-const route = useRoute()
 const config = useRuntimeConfig()
 const { whatsappNumber } = useSiteConfig()
 const waUrl = whatsappLink()
 
-type DirectoryItem = {
-  id: string
-  name: string
-  description: string
-  icon: 'visa' | 'badal' | 'hotel' | 'flight' | 'transport' | 'guide' | 'handling' | 'kit'
-  to?: string
-  service?: Service
-}
-
-const directoryItems = computed<DirectoryItem[]>(() => {
-  const byCode = (code: string) => services.value.find((service) => service.code?.toLowerCase() === code)
-  const visa = byCode('visa') ?? services.value.find((service) => service.name.toLowerCase().includes('visa'))
-  const muthawwif = services.value.find((service) => `${service.code ?? ''} ${service.name}`.toLowerCase().includes('muth'))
-  const handling = services.value.find((service) => `${service.code ?? ''} ${service.name}`.toLowerCase().includes('handling'))
-  const known = new Set([visa?.id, muthawwif?.id, handling?.id])
-  const otherServices = services.value.filter((service) => !known.has(service.id))
-
-  return [
-    visa && { id: visa.id, name: visa.name, description: visa.description, icon: 'visa' as const, to: '/services/visa', service: visa },
-    { id: 'badal-umroh', name: 'Badal Umroh', description: 'Bantuan pengurusan Badal Umroh sesuai kebutuhan keluarga Anda.', icon: 'badal' as const },
-    { id: 'hotel', name: 'Hotel', description: 'Cari akomodasi di Makkah dan Madinah.', icon: 'hotel' as const, to: '/hotels' },
-    { id: 'flight', name: 'Penerbangan', description: 'Lihat pilihan perjalanan udara yang tersedia.', icon: 'flight' as const, to: '/flights' },
-    { id: 'transport', name: 'Transportasi', description: 'Atur transfer dan perjalanan selama di Saudi.', icon: 'transport' as const, to: '/transportation' },
-    muthawwif && { id: muthawwif.id, name: muthawwif.name, description: muthawwif.description, icon: 'guide' as const, service: muthawwif },
-    handling && { id: handling.id, name: handling.name, description: handling.description, icon: 'handling' as const, service: handling },
-    ...otherServices.map((service) => ({ id: service.id, name: service.name, description: service.description, icon: 'kit' as const, service })),
-  ].filter(Boolean) as DirectoryItem[]
-})
-
-function pricingUnitLabel(service: Service) {
-  if (service.pricingUnit === 'group_session') return 'per sesi'
-  if (service.pricingUnit === 'package') return 'per paket'
-  return 'per jamaah'
-}
-
-const inquiryService = ref<Service | null>(null)
-const inquiryTitle = ref('')
+const selectedService = ref<PublicService | null>(null)
 const iForm = reactive({ name: '', whatsapp: '', email: '', notes: '' })
 const iError = ref<string | null>(null)
 const iPending = ref(false)
-const iDone = ref<ServiceInquiryResult | null>(null)
+const iDone = ref(false)
 
-function openInquiry(service: Service, title = service.name) {
-  inquiryService.value = service
-  inquiryTitle.value = title
-  iDone.value = null
+function openInquiry(service: PublicService) {
+  selectedService.value = service
+  iDone.value = false
   iError.value = null
   Object.assign(iForm, { name: '', whatsapp: '', email: '', notes: '' })
 }
 
-function openBadalInquiry() {
-  openInquiry({ id: 'badal-umroh', code: 'badal', name: 'Badal Umroh', description: '', price: null, pricingUnit: 'pax', image: '', status: 'active' }, 'Badal Umroh')
-}
-
 function closeInquiry() {
-  inquiryService.value = null
-  inquiryTitle.value = ''
-  iDone.value = null
+  selectedService.value = null
+  iDone.value = false
 }
-
-watch(
-  [services, () => route.query.service],
-  ([availableServices, serviceCode]) => {
-    if (serviceCode !== 'visa' || inquiryService.value) return
-    const service = availableServices.find((item) => item.code?.toLowerCase() === 'visa')
-    if (service) openInquiry(service)
-  },
-  { immediate: true },
-)
 
 async function submitInquiry() {
   iError.value = null
   const name = iForm.name.trim()
   const whatsapp = iForm.whatsapp.trim()
-  if (name.length < 2) {
-    iError.value = 'Mohon isi nama Anda (minimal 2 karakter).'
-    return
-  }
-  if (!/^[0-9]{8,18}$/.test(whatsapp)) {
-    iError.value = 'Mohon isi nomor WhatsApp yang benar (angka saja).'
-    return
-  }
+  if (name.length < 2) return void (iError.value = 'Mohon isi nama Anda (minimal 2 karakter).')
+  if (!/^[0-9]{8,18}$/.test(whatsapp)) return void (iError.value = 'Mohon isi nomor WhatsApp yang benar (angka saja).')
   iPending.value = true
   try {
-    const serviceId = inquiryService.value && /^\d+$/.test(inquiryService.value.id) ? Number(inquiryService.value.id) : null
-    const res = await $fetch<{ data: ServiceInquiryResult }>(`${config.public.apiBaseUrl}/api/v1/leads`, {
+    await $fetch(`${config.public.apiBaseUrl}/api/v1/leads`, {
       method: 'POST',
-      body: { serviceId, name, whatsapp, email: iForm.email.trim() || null, notes: iForm.notes.trim() || null },
+      body: { serviceId: null, name, whatsapp, email: iForm.email.trim() || null, notes: [selectedService.value?.name ? `Layanan yang diminati: ${selectedService.value.name}` : '', iForm.notes.trim()].filter(Boolean).join('. ') || null },
     })
-    iDone.value = res.data
+    iDone.value = true
   } catch (err: unknown) {
     const e = err as { data?: { statusMessage?: string } }
     iError.value = e.data?.statusMessage ?? 'Terjadi kendala saat mengirim. Silakan coba lagi.'
@@ -113,7 +52,7 @@ async function submitInquiry() {
   }
 }
 
-const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildServiceInquiryMessage(iForm.name.trim(), inquiryService.value))}`)
+const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildServiceInquiryMessage(iForm.name.trim(), selectedService.value ? { name: selectedService.value.name } : null))}`)
 </script>
 
 <template>
@@ -125,10 +64,8 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
           <h1 class="mx-auto mt-4 max-w-2xl font-heading text-3xl font-semibold leading-tight text-sht-olive-dark sm:text-5xl">Pilih Bantuan yang Anda Perlukan.</h1>
           <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-sht-charcoal/75 sm:text-lg">Temukan kebutuhan perjalanan dan pendampingan Umroh dalam satu tempat, lalu pilih layanan yang sesuai dengan rencana Anda.</p>
         </div>
-        <div v-if="pending" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><div v-for="n in 6" :key="n" class="h-56 animate-pulse rounded-2xl bg-sht-stone/60" aria-hidden="true" /></div>
-        <div v-else-if="error" class="mt-10 rounded-2xl border border-sht-stone bg-white p-8 text-center"><p class="text-sm text-sht-charcoal/70">Kami kesulitan memuat layanan. Silakan coba lagi.</p><AppButton variant="gold" class="mt-4" @click="refresh">Coba Lagi</AppButton></div>
-        <div v-else class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <article v-for="item in directoryItems" :key="item.id" class="flex flex-col rounded-2xl border border-sht-stone bg-white p-5 shadow-[0_8px_24px_-20px_rgba(45,53,31,0.45)]">
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <article v-for="item in serviceDirectory" :key="item.key" class="flex flex-col rounded-2xl border border-sht-stone bg-white p-5 shadow-[0_8px_24px_-20px_rgba(45,53,31,0.45)]">
             <div class="flex items-start justify-between gap-4"><div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sht-gold/15 text-sht-olive" aria-hidden="true">
               <svg v-if="item.icon === 'visa'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h7l3 3V20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path stroke-linecap="round" d="M14 3.5V7h3M8.5 12h5M8.5 15h3"/></svg>
               <svg v-else-if="item.icon === 'badal'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M20 8.5c0 5-8 10-8 10s-8-5-8-10A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8 2.5Z"/><path stroke-linecap="round" d="M12 9v4M10 11h4"/></svg>
@@ -142,11 +79,9 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
             <h3 class="mt-4 font-heading text-lg font-semibold text-sht-olive-dark">{{ item.name }}</h3>
             <p class="mt-1.5 line-clamp-3 flex-1 text-sm leading-relaxed text-sht-charcoal/70">{{ item.description }}</p>
             <div class="mt-4 flex items-center justify-between gap-3 border-t border-sht-stone/80 pt-3">
-              <div v-if="item.service?.price !== null && item.service" class="min-w-0 flex items-baseline gap-1.5"><span class="font-heading text-base font-semibold text-sht-olive-dark">{{ formatPrice(item.service.price) }}</span><span class="truncate text-xs text-sht-charcoal/55">{{ pricingUnitLabel(item.service) }}</span></div>
-              <span v-else-if="item.service" class="text-xs font-semibold text-sht-olive-dark">Harga dikonfirmasi</span>
-              <span v-else class="text-xs text-sht-charcoal/45">Lihat detail</span>
-              <NuxtLink v-if="item.to" :to="item.to" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold">{{ item.to === '/hotels' ? 'Lihat Hotel' : item.to === '/flights' ? 'Lihat Penerbangan' : item.to === '/transportation' ? 'Lihat Transportasi' : 'Selengkapnya' }} <span aria-hidden="true">→</span></NuxtLink>
-              <button v-else type="button" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold" @click="item.id === 'badal-umroh' ? openBadalInquiry() : item.service && openInquiry(item.service)">Konsultasikan <span aria-hidden="true">→</span></button>
+              <span class="text-xs font-semibold text-sht-olive-dark">{{ item.action === 'route' ? 'Lihat detail' : 'Konsultasi' }}</span>
+              <NuxtLink v-if="item.action === 'route'" :to="item.to" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold">{{ item.to === '/hotels' ? 'Lihat Hotel' : item.to === '/flights' ? 'Lihat Penerbangan' : item.to === '/transportation' ? 'Lihat Transportasi' : 'Selengkapnya' }} <span aria-hidden="true">→</span></NuxtLink>
+              <button v-else type="button" class="shrink-0 text-sm font-semibold text-sht-olive transition-colors hover:text-sht-olive-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sht-gold" @click="openInquiry(item)">Konsultasikan <span aria-hidden="true">→</span></button>
             </div>
           </article>
         </div>
@@ -163,7 +98,7 @@ const iWaUrl = computed(() => `https://wa.me/${whatsappNumber}?text=${encodeURIC
       </Container>
     </section>
 
-    <div v-if="inquiryService" class="fixed inset-0 z-50 flex items-end justify-center bg-sht-olive-dark/55 p-4 sm:items-center" role="dialog" aria-modal="true" :aria-label="`Konsultasi ${inquiryTitle}`"><div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-sht-stone bg-sht-off-white p-6 shadow-2xl sm:p-8"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-sage">KONSULTASI LAYANAN</p><h3 class="mt-2 font-heading text-xl font-semibold text-sht-olive-dark">{{ inquiryTitle }}</h3><p class="mt-1 text-sm text-sht-charcoal/60">Tim kami akan menghubungi Anda — gratis, tanpa komitmen.</p></div><button type="button" class="rounded-full p-2 text-sht-charcoal/50 hover:bg-sht-stone/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sht-gold" aria-label="Tutup" @click="closeInquiry"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div v-if="selectedService" class="fixed inset-0 z-50 flex items-end justify-center bg-sht-olive-dark/55 p-4 sm:items-center" role="dialog" aria-modal="true" :aria-label="`Konsultasi ${selectedService.name}`"><div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-sht-stone bg-sht-off-white p-6 shadow-2xl sm:p-8"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-sht-sage">KONSULTASI LAYANAN</p><h3 class="mt-2 font-heading text-xl font-semibold text-sht-olive-dark">{{ selectedService.name }}</h3><p class="mt-1 text-sm text-sht-charcoal/60">Tim kami akan menghubungi Anda — gratis, tanpa komitmen.</p></div><button type="button" class="rounded-full p-2 text-sht-charcoal/50 hover:bg-sht-stone/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sht-gold" aria-label="Tutup" @click="closeInquiry"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
       <div v-if="iDone" class="mt-6 text-center"><span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sht-gold/20 text-sht-olive"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg></span><p class="mt-3 font-heading text-lg font-semibold text-sht-olive-dark">Permintaan terkirim!</p><p class="mt-2 text-sm text-sht-charcoal/70">Konsultan kami akan menghubungi Anda. Untuk lebih cepat, lanjutkan via WhatsApp.</p><AppButton :href="iWaUrl" variant="gold" block external class="mt-5">Lanjut via WhatsApp</AppButton><button type="button" class="mt-3 min-h-[40px] w-full rounded-full px-4 text-sm font-semibold text-sht-charcoal/60 hover:text-sht-olive" @click="closeInquiry">Tutup</button></div>
       <form v-else class="mt-5 space-y-4" @submit.prevent="submitInquiry"><label class="block text-sm font-semibold text-sht-charcoal">Nama Anda *<input v-model="iForm.name" type="text" autocomplete="name" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: Siti Maryam" /></label><label class="block text-sm font-semibold text-sht-charcoal">Nomor WhatsApp *<input v-model="iForm.whatsapp" type="tel" inputmode="numeric" autocomplete="tel" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: 6281234567890" /></label><label class="block text-sm font-semibold text-sht-charcoal">Email (opsional)<input v-model="iForm.email" type="email" autocomplete="email" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: nama@email.com" /></label><label class="block text-sm font-semibold text-sht-charcoal">Catatan (opsional)<input v-model="iForm.notes" type="text" class="mt-1.5 min-h-[44px] w-full rounded-xl border border-sht-stone bg-white px-4 py-2.5 text-sm font-normal focus:border-sht-olive focus:outline-none focus:ring-2 focus:ring-sht-olive/20" placeholder="cth: keluarga 4 orang, akhir Oktober" /></label><p v-if="iError" class="rounded-xl border border-sht-gold/60 bg-sht-gold/10 px-4 py-2.5 text-sm" role="alert">{{ iError }}</p><AppButton variant="gold" block type="submit" :disabled="iPending">{{ iPending ? 'Mengirim…' : 'Kirim Permintaan' }}</AppButton></form>
     </div></div>

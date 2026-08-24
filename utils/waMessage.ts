@@ -39,7 +39,7 @@ export function buildWhatsAppMessage(customerName: string, result: EstimationSub
 }
 
 /** Pesan inquiry layanan tunggal (tanpa estimasi). */
-export function buildServiceInquiryMessage(customerName: string, service: Service | null): string {
+export function buildServiceInquiryMessage(customerName: string, service: Pick<Service, 'name'> | null): string {
   const lines: string[] = []
   lines.push(`Assalamu'alaikum, saya ${customerName} ingin konsultasi layanan:${service ? ` ${service.name}` : ''}.`)
   lines.push('Mohon info detail dan proses selanjutnya. Terima kasih!')
